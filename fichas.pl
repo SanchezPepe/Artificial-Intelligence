@@ -5,7 +5,7 @@
     unos. Así, con los dos, tres, cuatro y cinco hasta llegar a los seis.
 */
 
-ficha(blanca, 0, 0).
+ficha(0, 0).
 
 ficha(1, 0).
 ficha(1, 1).
