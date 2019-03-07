@@ -52,4 +52,26 @@ seis(7).
     Suponiendo 1 vs 1
 */
 pozo(14). 
+desconocidas([0,0]|[[1,0],[1,1],[2,0],[2,1],[2,2],[3,0],[3,1],[3,2],[3,3],[4,0],[4,1],[4,2],
+[4,3],[4,4],[5,0],[5,1],[5,2],[5,3],[5,4],[5,5],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6]]).
 
+/*
+Aqui le cargamos las fichas que nos reparten al inicio del juego. 
+Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin".
+*/
+
+mano().
+repite.
+repite:-
+    repite.
+
+:-dynamic mano/1.
+
+
+inicio():-
+    write("Ingresa las 7 fichas iniciales. "),nl,
+    repite,
+    read(Ficha),
+    
+    assert(mano(Ficha)),
+    Ficha==fin.
