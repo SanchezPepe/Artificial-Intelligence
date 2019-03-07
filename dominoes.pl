@@ -13,5 +13,23 @@ Funciones a implementar:
         c) Mantener variada la mano de fichas
     5.- Imprimir tablero
     
+
+    Links
+    List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
+
     
 **/
+
+turno(0).
+pozo(7).
+
+
+roba:-
+    !.
+roba:-
+   pozo(0),
+   pasa.
+roba(X):-
+    append(mano,X).
+pasa:-
+    turno is 0.
