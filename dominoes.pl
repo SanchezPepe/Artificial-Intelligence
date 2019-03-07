@@ -33,3 +33,12 @@ roba(X):-
     append(mano,X).
 pasa:-
     turno is 0.
+
+diferencia([H|T1],L2,[H|L3]):-
+    not(member(H,L2)),
+    diferencia(T1,L2,L3).
+diferencia([H|T1],L2,L3):-
+    member(H,L2),
+    diferencia(T1,L2,L3),!.
+diferencia([],_,[]).
+
