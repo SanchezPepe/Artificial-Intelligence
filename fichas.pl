@@ -39,3 +39,10 @@ ficha(6, 3).
 ficha(6, 4).
 ficha(6, 5).
 ficha(6, 6).
+
+uno(7).
+dos(7).
+tres(7).
+cuatro(7).
+cinco(7).
+seis(7).
