@@ -16,7 +16,7 @@ Funciones a implementar:
 
     Links
     List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
-
+    :)
     
 **/
 
