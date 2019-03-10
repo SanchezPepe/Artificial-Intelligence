@@ -19,26 +19,17 @@ Funciones a implementar:
     :)
     
 **/
+:- ensure_loaded(fichas).
 
-turno(0).
-pozo(7).
-
-
-roba:-
-    !.
 roba:-
    pozo(0),
    pasa.
-roba(X):-
-    append(mano,X).
+roba():-
+    write("Dame la ficha que robo. "),nl,
+    read(Ficha),
+    assert(mano(Ficha)).
 pasa:-
     turno is 0.
 
-diferencia([H|T1],L2,[H|L3]):-
-    not(member(H,L2)),
-    diferencia(T1,L2,L3).
-diferencia([H|T1],L2,L3):-
-    member(H,L2),
-    diferencia(T1,L2,L3),!.
-diferencia([],_,[]).
+
 
