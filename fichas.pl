@@ -42,14 +42,10 @@ cuatro(7).
 cinco(7).
 seis(7).
 
-/*
-    Suponiendo 1 vs 1
-*/
 pozo(14).
-/*
-Aqui le cargamos las fichas que nos reparten al inicio del juego. 
-Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.".
-*/
+
+/* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
+Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
 
 repite.
 repite:-

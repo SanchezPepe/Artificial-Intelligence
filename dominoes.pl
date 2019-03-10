@@ -1,7 +1,7 @@
 /**
 Al inicio el sistema recibe:
     1.- Las fichas asignadas ------------ LISTO
-    2.- Quién tira primero - quién tuvo la mula más grande  ----- Se indica por meido de turno(X). 
+    2.- Quién tira primero - quién tuvo la mula más grande  ----- LISTO. Se indica por meido de turno(X). 
        X = 1, es nuestro turno. X = 0, es turno del contrincante. Por default está en 1 al inicio del juego. 
 
 Funciones a implementar:
@@ -17,8 +17,6 @@ Funciones a implementar:
 
     Links
     List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
-    :)
-    
 **/
 :- ensure_loaded(fichas).
 
@@ -32,7 +30,7 @@ roba:-
     retract(desconocidas(Ficha)).
 pasa:-
     assert(turno(0)),
-    retract(turno(1)).
+    retractall(turno(1)).
 
 
 
