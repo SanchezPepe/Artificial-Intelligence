@@ -27,7 +27,8 @@ roba:-
 roba():-
     write("Dame la ficha que robo. "),nl,
     read(Ficha),
-    assert(mano(Ficha)).
+    assert(mano(Ficha)),
+    retract(desconocidas(Ficha)).
 pasa:-
     turno is 0.
 
