@@ -1,5 +1,6 @@
 :-dynamic mano/1.
 :-dynamic desconocidas/1.
+:-dynamic turno/1.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).
@@ -29,7 +30,9 @@ desconocidas([6, 3]).
 desconocidas([6, 4]).
 desconocidas([6, 5]).
 desconocidas([6, 6]).
-desconocidas(fin).
+desconocidas(fin).    /*Para que en "inicio" no de error al poner "fin"  */
+
+turno(1).
 
 cero(7).
 uno(7).

@@ -1,10 +1,11 @@
 /**
 Al inicio el sistema recibe:
-    1.- Las fichas asignadas
-    2.- Quién tira primero - quién tuvo la mula más grande
+    1.- Las fichas asignadas ------------ LISTO
+    2.- Quién tira primero - quién tuvo la mula más grande  ----- Se indica por meido de turno(X). 
+       X = 1, es nuestro turno. X = 0, es turno del contrincante. Por default está en 1 al inicio del juego. 
 
 Funciones a implementar:
-    1.- Tomar del pozo (robar)
+    1.- Tomar del pozo (robar) ---------- LISTO
     2.- Tirar ficha
     3.- Tirar ficha rival
     4.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo)
@@ -24,13 +25,14 @@ Funciones a implementar:
 roba:-
    pozo(0),
    pasa.
-roba():-
+roba:-
     write("Dame la ficha que robo. "),nl,
     read(Ficha),
     assert(mano(Ficha)),
     retract(desconocidas(Ficha)).
 pasa:-
-    turno is 0.
+    assert(turno(0)),
+    retract(turno(1)).
 
 
 
