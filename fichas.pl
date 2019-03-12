@@ -1,6 +1,7 @@
 :-dynamic mano/1.
 :-dynamic desconocidas/1.
 :-dynamic turno/1.
+:-dynamic robaOPasa/1.     
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).

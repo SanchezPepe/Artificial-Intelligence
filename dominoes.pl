@@ -32,5 +32,17 @@ pasa:-
     assert(turno(0)),
     retractall(turno(1)).
 
+tiroOponente:-
+    /*
+    Preguntar si el oponente roba o pasa.
+    Meter los valores con los que pasó a robaOPaso.
 
+    */
+
+tiroOponente:-
+    /*
+    Meter la ficha al tablero
+    Quitar de desconocidas.
+    Cambiar turno
+    */
 
