@@ -45,6 +45,8 @@ seis(7).
 
 pozo(14).
 
+tablero([]).
+
 /* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
 Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
 

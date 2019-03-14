@@ -32,17 +32,21 @@ pasa:-
     assert(turno(0)),
     retractall(turno(1)).
 
+insertaLista(List,Item) :-
+    List = [Start|[To_add|Rest]],
+    nonvar(Start),
+    (var(To_add),To_add=Item;insertaLista([To_add|Rest],Item)).
+
 tiroOponente:-
-    /*
+    write("¿El oponente tiró alguna ficha?. si/no"),nl,
+    read(Resp),
+    Resp==si,
+    read(Ficha),
+    insertaLista(tablero,Ficha).
+
+/*
     Preguntar si el oponente roba o pasa.
     Meter los valores con los que pasó a robaOPaso.
+*/
 
-    */
-
-tiroOponente:-
-    /*
-    Meter la ficha al tablero
-    Quitar de desconocidas.
-    Cambiar turno
-    */
 
