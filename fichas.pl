@@ -31,9 +31,7 @@ desconocidas([6, 3]).
 desconocidas([6, 4]).
 desconocidas([6, 5]).
 desconocidas([6, 6]).
-desconocidas(fin).    /*Para que en "inicio" no de error al poner "fin"  */
-
-turno(1).
+desconocidas(fin).    
 
 cero(7).
 uno(7).
@@ -44,20 +42,3 @@ cinco(7).
 seis(7).
 
 pozo(14).
-
-tablero([]).
-
-/* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
-Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
-
-repite.
-repite:-
-    repite.
-
-inicio():-
-    write("Ingresa las 7 fichas iniciales. "),nl,
-    repite,
-    read(Ficha),    
-    assert(mano(Ficha)),
-    retract(desconocidas(Ficha)),
-    Ficha==fin.

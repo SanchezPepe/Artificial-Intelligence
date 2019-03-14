@@ -20,6 +20,23 @@ Funciones a implementar:
 **/
 :- ensure_loaded(fichas).
 
+/*Para que en "inicio" no de error al poner "fin"  */
+
+/* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
+Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
+
+repite.
+repite:-
+    repite.
+
+inicio():-
+    write("Ingresa las 7 fichas iniciales. "),nl,
+    repite,
+    read(Ficha),    
+    assert(mano(Ficha)),
+    retract(desconocidas(Ficha)),
+    Ficha==fin.
+
 roba:-
    pozo(0),
    pasa.
