@@ -4,12 +4,7 @@
 :-dynamic robaOPasa/1. 
 :-dynamic tablero/1.    
 :-dynamic cero/1.
-:-dynamic uno/1.
-:-dynamic dos/1.
-:-dynamic tres/1.
-:-dynamic cuarto/1.
-:-dynamic cinco/1.
-:-dynamic seis/1.
+:-dynamic extremos/2.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).

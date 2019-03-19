@@ -51,6 +51,21 @@ reverse([],Z,Z).
 reverse([H|T],Z,Acc):-
     reverse(T,Z,[H|Acc]).
 
+
+extremoIzq():-
+    tablero([H|_]),
+    extremoIzq(H).
+extremoIzq([H|_]):-
+    assert(extremos(H,_)).
+
+extremoDer():-
+    tablero([_|T]),
+    reverse(T,X,[]),
+    extremoDer(X).
+extremoDer([H|_]):-
+    write(H).
+
+
 tiroOponente:-
     write("¿El oponente tiró alguna ficha? si/no"),nl,
     read(Resp),
