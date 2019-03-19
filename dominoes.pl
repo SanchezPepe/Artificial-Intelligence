@@ -20,8 +20,6 @@ Funciones a implementar:
 **/
 :- ensure_loaded(fichas).
 
-/*Para que en "inicio" no de error al poner "fin"  */
-
 /* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
 Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
 
@@ -49,21 +47,29 @@ pasa:-
     assert(turno(0)),
     retractall(turno(1)).
 
-insertaLista(List,Item) :-
-    List = [Start|[To_add|Rest]],
-    nonvar(Start),
-    (var(To_add),To_add=Item;insertaLista([To_add|Rest],Item)).
+reverse([],Z,Z).
+reverse([H|T],Z,Acc):-
+    reverse(T,Z,[H|Acc]).
 
 tiroOponente:-
-    write("¿El oponente tiró alguna ficha?. si/no"),nl,
+    write("¿El oponente tiró alguna ficha? si/no"),nl,
     read(Resp),
     Resp==si,
+    write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    insertaLista(tablero,Ficha).
+    retract(desconocidas(Ficha)),
+    tablero(X),
+    append(X,[Ficha],Y),
+    retract(tablero(X)),
+    assert(tablero(Y)).
 
-/*
+/* tiroOponente
     Preguntar si el oponente roba o pasa.
-    Meter los valores con los que pasó a robaOPaso.
-*/
+    Meter los valores con los que pasó a robaOPaso usando un assert de los extremos del tablero.
+    */
 
-
+restaCero:-
+    cero(X),
+    Y is X-1,
+    retract(cero(X)),
+    assert(cero(Y)).

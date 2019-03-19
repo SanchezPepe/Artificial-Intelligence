@@ -1,7 +1,15 @@
 :-dynamic mano/1.
 :-dynamic desconocidas/1.
 :-dynamic turno/1.
-:-dynamic robaOPasa/1.     
+:-dynamic robaOPasa/1. 
+:-dynamic tablero/1.    
+:-dynamic cero/1.
+:-dynamic uno/1.
+:-dynamic dos/1.
+:-dynamic tres/1.
+:-dynamic cuarto/1.
+:-dynamic cinco/1.
+:-dynamic seis/1.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).
@@ -42,3 +50,5 @@ cinco(7).
 seis(7).
 
 pozo(14).
+
+tablero([]).
