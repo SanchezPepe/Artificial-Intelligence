@@ -1,7 +1,10 @@
 :-dynamic mano/1.
 :-dynamic desconocidas/1.
 :-dynamic turno/1.
-:-dynamic robaOPasa/1.     
+:-dynamic robaOPasa/1. 
+:-dynamic tablero/1.    
+:-dynamic extremoDerecho/1.
+:-dynamic extremoIzquierdo/1.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).
@@ -33,12 +36,6 @@ desconocidas([6, 5]).
 desconocidas([6, 6]).
 desconocidas(fin).    
 
-cero(7).
-uno(7).
-dos(7).
-tres(7).
-cuatro(7).
-cinco(7).
-seis(7).
+pozo(14).  /*Al inicio de cada juego de 1v1, el pozo empieza en 14 fichas. */
 
-pozo(14).
+tablero([]).

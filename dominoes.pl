@@ -7,20 +7,18 @@ Al inicio el sistema recibe:
 Funciones a implementar:
     1.- Tomar del pozo (robar) ---------- LISTO
     2.- Tirar ficha
-    3.- Tirar ficha rival
+    3.- Tirar ficha rival -------------- LISTO
     4.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo)
         a) Cuando el rival tome del pozo, guardar las fichas que no tiene
         b) Deshacerse lo más rápido posible de las mulas
         c) Mantener variada la mano de fichas
-    5.- Imprimir tablero
+    5.- Imprimir tablero ------------  LISTO
     
 
     Links
     List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
 **/
 :- ensure_loaded(fichas).
-
-/*Para que en "inicio" no de error al poner "fin"  */
 
 /* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
 Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
@@ -49,21 +47,45 @@ pasa:-
     assert(turno(0)),
     retractall(turno(1)).
 
-insertaLista(List,Item) :-
-    List = [Start|[To_add|Rest]],
-    nonvar(Start),
-    (var(To_add),To_add=Item;insertaLista([To_add|Rest],Item)).
+reverse([],Z,Z).
+reverse([H|T],Z,Acc):-
+    reverse(T,Z,[H|Acc]).
+
+extremoIzq():-
+    tablero([H|_]),
+    extremoIzq(H).
+extremoIzq([H|_]):-
+    retractall(extremoIzquierdo(_)),
+    assert(extremoIzquierdo(H)).
+
+extremoDer():-
+    tablero([_|T]),
+    reverse(T,X,[]),
+    extremoDer(X),!.
+extremoDer([H|_]):-
+    reverse(H,X,[]),
+    is_list(X),
+    extremoDer(X),!.
+extremoDer([H|_]):-
+    retractall(extremoDerecho(_)),
+    assert(extremoDerecho(H)).
+
 
 tiroOponente:-
-    write("¿El oponente tiró alguna ficha?. si/no"),nl,
+    write("¿El oponente tiró alguna ficha? si/no"),nl,
     read(Resp),
     Resp==si,
+    write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    insertaLista(tablero,Ficha).
+    retract(desconocidas(Ficha)),
+    tablero(X),
+    append(X,[Ficha],Y),
+    retract(tablero(X)),
+    assert(tablero(Y)),
+    extremoDer,
+    extremoIzq.
 
-/*
+    /* tiroOponente
     Preguntar si el oponente roba o pasa.
-    Meter los valores con los que pasó a robaOPaso.
-*/
-
-
+    Meter los valores con los que pasó a robaOPaso usando un assert de los extremos del tablero.
+    */
