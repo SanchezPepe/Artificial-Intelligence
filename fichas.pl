@@ -3,8 +3,8 @@
 :-dynamic turno/1.
 :-dynamic robaOPasa/1. 
 :-dynamic tablero/1.    
-:-dynamic cero/1.
-:-dynamic extremos/2.
+:-dynamic extremoDerecho/1.
+:-dynamic extremoIzquierdo/1.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).
