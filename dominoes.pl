@@ -7,12 +7,12 @@ Al inicio el sistema recibe:
 Funciones a implementar:
     1.- Tomar del pozo (robar) ---------- LISTO
     2.- Tirar ficha
-    3.- Tirar ficha rival
+    3.- Tirar ficha rival -------------- LISTO
     4.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo)
         a) Cuando el rival tome del pozo, guardar las fichas que no tiene
         b) Deshacerse lo más rápido posible de las mulas
         c) Mantener variada la mano de fichas
-    5.- Imprimir tablero
+    5.- Imprimir tablero ------------  LISTO
     
 
     Links
@@ -63,8 +63,9 @@ extremoDer():-
     reverse(T,X,[]),
     extremoDer(X),!.
 extremoDer([H|_]):-
-    is_list(H),
-    extremoDer(H),!.
+    reverse(H,X,[]),
+    is_list(X),
+    extremoDer(X),!.
 extremoDer([H|_]):-
     retractall(extremoDerecho(_)),
     assert(extremoDerecho(H)).
@@ -82,7 +83,7 @@ tiroOponente:-
     retract(tablero(X)),
     assert(tablero(Y)).
 
-/* tiroOponente
+    /* tiroOponente
     Preguntar si el oponente roba o pasa.
     Meter los valores con los que pasó a robaOPaso usando un assert de los extremos del tablero.
     */

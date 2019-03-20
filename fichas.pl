@@ -36,14 +36,6 @@ desconocidas([6, 5]).
 desconocidas([6, 6]).
 desconocidas(fin).    
 
-cero(7).
-uno(7).
-dos(7).
-tres(7).
-cuatro(7).
-cinco(7).
-seis(7).
-
-pozo(14).
+pozo(14).  /*Al inicio de cada juego de 1v1, el pozo empieza en 14 fichas. */
 
 tablero([]).
