@@ -81,7 +81,9 @@ tiroOponente:-
     tablero(X),
     append(X,[Ficha],Y),
     retract(tablero(X)),
-    assert(tablero(Y)).
+    assert(tablero(Y)),
+    extremoDer,
+    extremoIzq.
 
     /* tiroOponente
     Preguntar si el oponente roba o pasa.
