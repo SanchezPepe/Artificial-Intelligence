@@ -87,20 +87,17 @@ tiroOponente:-
     extremoDer,
     extremoIzq.
 
-    /* tiroOponente
-    Preguntar si el oponente roba o pasa.
-    Meter los valores con los que pasó a robaOPaso usando un assert de los extremos del tablero.
-    */
+    
     
     
     decrementa(X):-
-    numeros(Y),
-    % Obtiene de la lista
-    nth0(X,Y,Z),
-    % Quita de la lista
-    nth1(X,Y, _, W),
-    A is Z-1,
-    % Inserta en la lsita
-    nth0(X, B, A, W),
-    retract(numeros(Y)),
-    assert(numeros(B)).
+        numeros(Y),
+        % Obtiene de la lista
+        nth0(X,Y,Z),
+        % Quita de la lista
+        nth1(X,Y, _, W),
+        A is Z-1,
+        % Inserta en la lsita
+        nth0(X, B, A, W),
+        retract(numeros(Y)),
+        assert(numeros(B)).
