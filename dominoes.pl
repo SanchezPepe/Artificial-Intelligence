@@ -79,25 +79,37 @@ tiroOponente:-
     Resp==si,
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    retract(desconocidas(Ficha)),
+    retract(desconocidas(Ficha)).
+    /*
     tablero(X),
     append(X,[Ficha],Y),
     retract(tablero(X)),
     assert(tablero(Y)),
     extremoDer,
     extremoIzq.
-
+----------------------------------------------------------------
+    Esto lo va a hacer el código de Sebas */
+tiroOponente:-
+    /*
+    Falta: 
+    Ingresar valores de extremos a noTiene
+    */
+    write("¿Cuántas fichas tomó del pozo? "),nl,
+    read(Num),
+    pozo(X),
+    Y is X-Num,
+    retract(pozo(X)),
+    assert(pozo(Y)).
     
     
-    
-    decrementa(X):-
-        numeros(Y),
-        % Obtiene de la lista
-        nth0(X,Y,Z),
-        % Quita de la lista
-        nth1(X,Y, _, W),
-        A is Z-1,
-        % Inserta en la lsita
-        nth0(X, B, A, W),
-        retract(numeros(Y)),
-        assert(numeros(B)).
+decrementa(X):-
+    numeros(Y),
+    % Obtiene de la lista
+    nth0(X,Y,Z),
+    % Quita de la lista
+    nth1(X,Y, _, W),
+    A is Z-1,
+    % Inserta en la lsita
+    nth0(X, B, A, W),
+    retract(numeros(Y)),
+    assert(numeros(B)).
