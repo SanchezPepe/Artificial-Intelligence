@@ -25,6 +25,22 @@ numeros([7,7,7,7,7,7,7]).
 /* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
 Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
 
+main:-
+    inicio,
+    write("¿Quién tiene el primer movimiento? yo/el"),nl,
+    read(Resp),
+    Resp==yo,
+    write("¿Cuál es la primera ficha que tiro? "),nl,
+    read(Ficha),
+    mano(X),
+    delete(X,Ficha,M),
+    retract(mano(X)),
+    assert(mano(M)),
+    tiroOponente.
+main:-
+    tiroOponente.
+
+
 repite.
 repite:-
     repite.
@@ -44,9 +60,16 @@ roba:-
    pozo(0).
 roba:-
     write("Dame la ficha que robo. "),nl,
-    read(Ficha),
-    assert(mano(Ficha)),
-    retract(desconocidas(Ficha)).
+    read(Ficha), 
+    mano(X),   
+    append(X,[Ficha],Y),
+    retract(mano(X)),
+    assert(mano(Y)),
+    retract(desconocidas(Ficha)),
+    pozo(P),
+    A is P-1,
+    retract(pozo(P)),
+    assert(pozo(A)).
 
 
 reverse([],Z,Z).
