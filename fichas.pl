@@ -40,3 +40,7 @@ desconocidas(fin).
 pozo(14).  /*Al inicio de cada juego de 1v1, el pozo empieza en 14 fichas. */
 
 tablero([]).
+
+noTiene([]).
+
+mano([]).

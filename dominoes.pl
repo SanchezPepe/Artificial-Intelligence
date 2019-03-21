@@ -32,22 +32,22 @@ repite:-
 inicio():-
     write("Ingresa las 7 fichas iniciales. "),nl,
     repite,
-    read(Ficha),    
-    assert(mano(Ficha)),
+    read(Ficha), 
+    mano(X),   
+    append(X,[Ficha],Y),
+    retract(mano(X)),
+    assert(mano(Y)),
     retract(desconocidas(Ficha)),
     Ficha==fin.
 
 roba:-
-   pozo(0),
-   pasa.
+   pozo(0).
 roba:-
     write("Dame la ficha que robo. "),nl,
     read(Ficha),
     assert(mano(Ficha)),
     retract(desconocidas(Ficha)).
-pasa:-
-    assert(turno(0)),
-    retractall(turno(1)).
+
 
 reverse([],Z,Z).
 reverse([H|T],Z,Acc):-
@@ -92,7 +92,12 @@ tiroOponente:-
 tiroOponente:-
     /*
     Falta: 
-    Ingresar valores de extremos a noTiene
+    Ingresar valores de extremos a noTiene:
+        noTiene(X),
+        append(X, ValIzq, Y),
+        append(Y, ValDer, Z),
+        retract(noTiene(X)),
+        assert(noTiene(Z)).
     */
     write("¿Cuántas fichas tomó del pozo? "),nl,
     read(Num),
@@ -100,6 +105,7 @@ tiroOponente:-
     Y is X-Num,
     retract(pozo(X)),
     assert(pozo(Y)).
+
     
     
 decrementa(X):-
