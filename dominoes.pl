@@ -195,28 +195,3 @@ movimientosPosibles([H|T]) :-
     movimientosPosibles(T).
 movimientosPosibles([_|T]):-
 movimientosPosibles(T).
-
-/*
-reverse([],Z,Z).
-reverse([H|T],Z,Acc):-
-    reverse(T,Z,[H|Acc]).
-
-extremoIzq():-
-    tablero([H|_]),
-    extremoIzq(H).
-extremoIzq([H|_]):-
-    retractall(extremoIzquierdo(_)),
-    assert(extremoIzquierdo(H)).
-
-extremoDer():-
-    tablero([_|T]),
-    reverse(T,X,[]),
-    extremoDer(X),!.
-extremoDer([H|_]):-
-    reverse(H,X,[]),
-    is_list(X),
-    extremoDer(X),!.
-extremoDer([H|_]):-
-    retractall(extremoDerecho(_)),
-    assert(extremoDerecho(H)).
-*/
