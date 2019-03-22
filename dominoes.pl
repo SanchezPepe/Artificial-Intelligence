@@ -16,9 +16,12 @@ numeros([7,7,7,7,7,7,7]).
 
 /* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
 Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
-
 main:-
     inicio,
+    mano(Z),
+    delete(Z, fin, Y),
+    retract(mano(Z)),
+    assert(mano(Y)),
     write("¿Quién tiene el primer movimiento? yo/el"),nl,
     read(Resp),
     Resp==yo,
