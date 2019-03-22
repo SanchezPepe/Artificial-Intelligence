@@ -189,12 +189,15 @@ decrementa(X):-
  * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
  * Regresa una sublista posibles([]) de la mano actual
  **/
-movimientosPosibles([], _).
-movimientosPosibles([H|T], Z):-
-    extremoDerecho(Y),
-    extremoIzquierdo(X),
+movimientosPosibles([]).
+movimientosPosibles([H|T]) :-
+    extremoDer(Y),
+    extremoIzq(X),
+    posibles(W),
     (member(X, H) ; member(Y,H)),
-    append(Z, [H], W),
-    movimientosPosibles(T, W), !.
-movimientosPosibles([_|T], Z):-
-    movimientosPosibles(T, Z), !.
+    append(W, [H], Z),
+    retract(posibles(W)),
+    assert(posibles(Z)),
+    movimientosPosibles(T).
+movimientosPosibles([_|T]):-
+movimientosPosibles(T).
