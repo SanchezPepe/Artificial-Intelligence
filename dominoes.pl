@@ -185,8 +185,8 @@ decrementa(X):-
  **/
 movimientosPosibles([], _).
 movimientosPosibles([H|T], Z) :-
-    extremoDer(Y),
-    extremoIzq(X),
+    extremoDerecho(Y),
+    extremoIzquierdo(X),
     (member(X, H) ; member(Y,H)),
     append(Z, [H], Z),
     movimientosPosibles(T, Z), !.
