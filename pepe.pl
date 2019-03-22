@@ -118,31 +118,54 @@ decrementa(X):-
  * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
  * Regresa una sublista posibles([]) de la mano actual
  **/
+/**
 movimientosPosibles([], _).
-movimientosPosibles([H|T], Z) :-
+movimientosPosibles([H|_], Z):-
     der(Y),
     izq(X),
     (member(X, H) ; member(Y,H)),
-    append(Z, [H], W),
-    Z is W,
-    movimientosPosibles(T, W), !.
+    append(Z, [H], R),
+    movimientosPosibles(T, R),
+    Z = R, !.
 movimientosPosibles([_|T], Z):-
     movimientosPosibles(T, Z), !.
 
-
-
 mano3([[3,2], [6,2], [4,7], [3,0]]).
+m3([4,2,3,3,3,3]).
 l([2,3]).
 busca:-
     mano3(X),
-    l(Y),
+    %l(Y),
     movimientosPosibles(X, Y),
     write(Y).
 
-
+**/
 /**
  * Min max
  * ['pepe.pl'].
  * movimientosPosibles([[5,4],[8,1], [4,2], [4,0], [1,4]]).
  * 
  **/
+
+funcionPeso(X):-
+    random(1, 10, X).
+
+/**
+ * POSIBLES = [[5,4],[8,1], [4,2], [4,0], [1,4]]
+ * LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
+ * */
+% Caso en el que bajó hasta la profundidad deseada.
+alfabeta(_, Prof, _, _, _, Peso):-
+    Prof == 0,
+    funcionPeso(X),
+    Peso is X.
+alfabeta(Nodo, Prof, Alfa, Beta, Max, Peso):-
+    Max == MAX,
+    posibles(X).
+
+    % For para cada hijo del nodo
+alfabeta(Nodo, Prof, Alfa, Beta, Max, Peso).
+
+
+
+
