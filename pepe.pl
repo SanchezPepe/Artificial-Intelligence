@@ -120,13 +120,24 @@ decrementa(X):-
  **/
 movimientosPosibles([], _).
 movimientosPosibles([H|T], Z) :-
-    extremoDer(Y),
-    extremoIzq(X),
+    der(Y),
+    izq(X),
     (member(X, H) ; member(Y,H)),
-    append(Z, [H], Z),
-    movimientosPosibles(T, Z), !.
+    append(Z, [H], W),
+    Z is W,
+    movimientosPosibles(T, W), !.
 movimientosPosibles([_|T], Z):-
     movimientosPosibles(T, Z), !.
+
+
+
+mano3([[3,2], [6,2], [4,7], [3,0]]).
+l([2,3]).
+busca:-
+    mano3(X),
+    l(Y),
+    movimientosPosibles(X, Y),
+    write(Y).
 
 
 /**
