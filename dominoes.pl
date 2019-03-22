@@ -162,7 +162,11 @@ actEI([A|ColaA]):-
     extremoIzquierdo(EI),
     (A==EI)->retractall(extremoIzquierdo(_)),sacaCola(ColaA,B),assert(extremoIzquierdo(B));
     retractall(extremoIzquierdo(_)),assert(extremoIzquierdo(A)).
-    
+
+/**
+ * Regla que decrementa la lista que guarda cuántas fichas quedan de cada grupo, se utliza en la 
+ * función eurística para dar información al sistema al momento de utlizar la función eurística.
+ **/
 decrementa(X):-
     numeros(Y),
     % Obtiene de la lista
@@ -174,6 +178,23 @@ decrementa(X):-
     nth0(X, B, A, W),
     retract(numeros(Y)),
     assert(numeros(B)).
+
+/**
+ * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
+ * Regresa una sublista posibles([]) de la mano actual
+ **/
+movimientosPosibles([]).
+movimientosPosibles([H|T]) :-
+    extremoDer(Y),
+    extremoIzq(X),
+    posibles(W),
+    (member(X, H) ; member(Y,H)),
+    append(W, [H], Z),
+    retract(posibles(W)),
+    assert(posibles(Z)),
+    movimientosPosibles(T).
+movimientosPosibles([_|T]):-
+movimientosPosibles(T).
 
 /*
 reverse([],Z,Z).
