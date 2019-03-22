@@ -74,6 +74,12 @@ inicio():-
     retract(desconocidas(Ficha)),
     Ficha==fin,!.
 
+tiro:-
+    mano(X),
+    movimientosPosibles(X,[H|_]),
+    H==[],
+    write("Sirve").
+
 /*
     Cuando no podeomos tirar ninguna ficha, se llama a "roba.". Primero, revisa si hay fichas en el pozo.
     En caso positivo, pide y lee una ficha y la ingresa a la mano, la quita de desconocidas y resta una
@@ -184,11 +190,11 @@ decrementa(X):-
  * Regresa una sublista posibles([]) de la mano actual
  **/
 movimientosPosibles([], _).
-movimientosPosibles([H|T], Z) :-
-    extremoDer(Y),
-    extremoIzq(X),
+movimientosPosibles([H|T], Z):-
+    extremoDerecho(Y),
+    extremoIzquierdo(X),
     (member(X, H) ; member(Y,H)),
-    append(Z, [H], Z),
-    movimientosPosibles(T, Z), !.
+    append(Z, [H], W),
+    movimientosPosibles(T, W), !.
 movimientosPosibles([_|T], Z):-
-movimientosPosibles(T, Z), !.
+    movimientosPosibles(T, Z), !.
