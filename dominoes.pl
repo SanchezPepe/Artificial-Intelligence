@@ -1,23 +1,15 @@
 /**
-Al inicio el sistema recibe:
-    1.- Las fichas asignadas ------------ LISTO
-    2.- Quién tira primero - quién tuvo la mula más grande  ----- LISTO. Se indica por meido de turno(X). 
-       X = 1, es nuestro turno. X = 0, es turno del contrincante. Por default está en 1 al inicio del juego. 
 
 Funciones a implementar:
-    1.- Tomar del pozo (robar) ---------- LISTO
-    2.- Tirar ficha
-    3.- Tirar ficha rival -------------- LISTO
-    4.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo)
+    1.- Tirar ficha
+    2.- Tirar ficha rival usar decremento para controlar núms
+    3.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo) 1/2
         a) Cuando el rival tome del pozo, guardar las fichas que no tiene
         b) Deshacerse lo más rápido posible de las mulas
         c) Mantener variada la mano de fichas
-    5.- Imprimir tablero ------------  LISTO
-    
-
-    Links
-    List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
+    4.- Alpha beta
 **/
+
 :- ensure_loaded(fichas).
 
 numeros([7,7,7,7,7,7,7]).
