@@ -14,8 +14,13 @@ Funciones a implementar:
 
 numeros([7,7,7,7,7,7,7]).
 
-/* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
-Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
+/* 
+    Para iniciar el juego se consulta "main.". Posteriormente, te pedirá las 7 fichas iniciales 
+    y se tendrán que meter en el formato "[a,b].". Después de ingresar la séptima ficha, se tendrá
+    que ingresar "fin.".
+    Después le tendremos que indicar al programa quién tiene el primer movimiento por medio de "yo."
+    o "el." En ambos casos, tenemos que ingresar cuál es la primera ficha del juego. 
+*/
 main:-
     inicio,
     mano(Z),
@@ -36,16 +41,28 @@ main:-
 main:-
     primerTiroOponente.
 
+/*
+    En caso de que empieze el oponente, esta regla recibe la ficha y llama otra regla que actualiza los
+    extremos del tablero. 
+*/
 primerTiroOponente:-
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
     retract(desconocidas(Ficha)),
     actualizaPrim(Ficha),!.
 
+
+/*
+    Cuando se llama esta regla, se pone un punto de retroceso.
+*/
 repite.
 repite:-
     repite.
 
+/*
+    Esta regla lee de la consola las 7 fichas iniciales y las ingresa a la lista guardada en el 
+    hecho "mano". Igualmente, cada que lee una ficha la quita del hecho "desconocidas".
+ */
 inicio():-
     write("Ingresa las 7 fichas iniciales. "),nl,
     repite,
@@ -57,6 +74,11 @@ inicio():-
     retract(desconocidas(Ficha)),
     Ficha==fin,!.
 
+/*
+    Cuando no podeomos tirar ninguna ficha, se llama a "roba.". Primero, revisa si hay fichas en el pozo.
+    En caso positivo, pide y lee una ficha y la ingresa a la mano, la quita de desconocidas y resta una
+    unidad del pozo. 
+*/
 roba:-
    pozo(0).
 roba:-
@@ -72,11 +94,14 @@ roba:-
     retract(pozo(P)),
     assert(pozo(A)).
 
-
-reverse([],Z,Z).
-reverse([H|T],Z,Acc):-
-    reverse(T,Z,[H|Acc]).
-
+/*
+    En las primeras 3 filas de la regla, le ingresamos al programa si el oponente tiró alguna ficha o no.
+    En caso afirmativo, ingresamos por medio de la consola qué ficha tiró, de qué lado del tablero la tiró.
+    Después, se llama a una regla que actualiza los extremos.
+    En caso negativo (el oponente no tira ninguna ficha) ingresamos cuántas fichas robó del pozo y 
+    actualizamos el número de fichas en el pozo. Finalmente, ingresamos los valores de los extremos el
+    tablero a un hecho llamado "noTiene" para guardar cuáles son los valores que hacen pasar al oponente. 
+*/
 tiroOponente:-
     write("¿El oponente tiró alguna ficha? si/no"),nl,
     read(Resp),
@@ -87,16 +112,13 @@ tiroOponente:-
     write("¿De qué lado del tablero tiró el oponente? d/i"),nl,
     read(Lado),
     actualizaExtremo(Ficha, Lado).
-
-tiroOponente:-
-    
+tiroOponente:-    
     write("¿Cuántas fichas tomó del pozo? "),nl,
     read(Num),
     pozo(X),
     Y is X-Num,
     retract(pozo(X)),
-    assert(pozo(Y)),
-        
+    assert(pozo(Y)),        
     extremoDerecho(ValDer),
     extremoIzquierdo(ValIzq),
     noTiene(N),
@@ -105,19 +127,37 @@ tiroOponente:-
     retract(noTiene(N)),
     assert(noTiene(Z)).
 
-
+/*
+    Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
+*/
 actualizaPrim([A|ColaA]):-
      sacaCola(ColaA,B),assert(extremoDerecho(B)),
      assert(extremoIzquierdo(A)).
+
+/*
+    Esta regla se llama cada que alguien tira una ficha, y se encarga de actualizar los extremos del tablero.
+*/
 actualizaExtremo(Ficha, Lado):-
     (Lado=i) -> actEI(Ficha);
     actED(Ficha).
+
+/*
+    Esta regla te regresa la cola de una lista.
+*/
 sacaCola([A|_],B):-
     B is A.
+
+/*
+    Esta regla actualiza el extremo derecho del tablero.
+*/
 actED([A|ColaA]):-
     extremoDerecho(ED),
     (A==ED)->retractall(extremoDerecho(_)), sacaCola(ColaA,B),assert(extremoDerecho(B));
     retractall(extremoDerecho(_)),assert(extremoDerecho(A)).
+
+/*
+    Esta regla actualiza el extremo izquierdo del tablero.
+*/
 actEI([A|ColaA]):-
     extremoIzquierdo(EI),
     (A==EI)->retractall(extremoIzquierdo(_)),sacaCola(ColaA,B),assert(extremoIzquierdo(B));
@@ -135,7 +175,12 @@ decrementa(X):-
     retract(numeros(Y)),
     assert(numeros(B)).
 
-/*extremoIzq():-
+/*
+reverse([],Z,Z).
+reverse([H|T],Z,Acc):-
+    reverse(T,Z,[H|Acc]).
+
+extremoIzq():-
     tablero([H|_]),
     extremoIzq(H).
 extremoIzq([H|_]):-
