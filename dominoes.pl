@@ -11,7 +11,6 @@ Funciones a implementar:
 **/
 
 :- ensure_loaded(fichas).
-
 numeros([7,7,7,7,7,7,7]).
 
 /* 
@@ -49,7 +48,7 @@ primerTiroOponente:-
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
     retract(desconocidas(Ficha)),
-    actualizaPrim(Ficha),!.
+    actualizaPrim(Ficha),tiro,!.
 
 
 /*
@@ -74,11 +73,36 @@ inicio():-
     retract(desconocidas(Ficha)),
     Ficha==fin,!.
 
+list_not_empty([_]).
+
+ladoFicha([_|[T]], SIDE):-
+    extremoDerecho(ED),
+    write(ED), nl, 
+    write(T == ED),
+    SIDE is 0, !.
+ladoFicha([H|_], SIDE):-
+    extremoIzquierdo(EI),
+    write(EI), nl, 
+    write(H == EI),
+    SIDE is 1, !.
+
 tiro:-
     mano(X),
-    movimientosPosibles(X,[H|_]),
-    H==[],
-    write("Sirve").
+    retractall(posibles(_)),
+    assert(posibles([])),
+    movimientosPosibles(X), %Cuando esté la poda, aquí se llamará y nos regresará un elemento Y
+    posibles([[A|B]|_]),
+    ladoFicha([A|B], Z),
+    list_not_empty([[A|B]|_]),
+    write("------------------- "),write([A|B]),nl,
+    delete(X,[A|B],M),
+    retract(mano(X)),
+    assert(mano(M)),
+    actualizaExtremo([A|B],Z),
+    tiroOponente.
+  
+tiro:-
+    roba.
 
 /*
     Cuando no podeomos tirar ninguna ficha, se llama a "roba.". Primero, revisa si hay fichas en el pozo.
@@ -86,7 +110,9 @@ tiro:-
     unidad del pozo. 
 */
 roba:-
-   pozo(0).
+   pozo(0),
+   write("Pozo vacío, paso."),nl,
+   tiroOponente.
 roba:-
     write("Dame la ficha que robo. "),nl,
     read(Ficha), 
@@ -98,8 +124,8 @@ roba:-
     pozo(P),
     A is P-1,
     retract(pozo(P)),
-    assert(pozo(A)).
-
+    assert(pozo(A)),
+    tiro.
 /*
     En las primeras 3 filas de la regla, le ingresamos al programa si el oponente tiró alguna ficha o no.
     En caso afirmativo, ingresamos por medio de la consola qué ficha tiró, de qué lado del tablero la tiró.
@@ -117,7 +143,7 @@ tiroOponente:-
     retract(desconocidas(Ficha)),
     write("¿De qué lado del tablero tiró el oponente? d/i"),nl,
     read(Lado),
-    actualizaExtremo(Ficha, Lado).
+    actualizaExtremo(Ficha, Lado),tiro.
 tiroOponente:-    
     write("¿Cuántas fichas tomó del pozo? "),nl,
     read(Num),
@@ -131,7 +157,7 @@ tiroOponente:-
     append(N, [ValIzq], S),
     append(S, [ValDer], Z),
     retract(noTiene(N)),
-    assert(noTiene(Z)).
+    assert(noTiene(Z)),tiro.
 
 /*
     Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
@@ -144,7 +170,7 @@ actualizaPrim([A|ColaA]):-
     Esta regla se llama cada que alguien tira una ficha, y se encarga de actualizar los extremos del tablero.
 */
 actualizaExtremo(Ficha, Lado):-
-    (Lado=i) -> actEI(Ficha);
+    (Lado=1) -> actEI(Ficha);
     actED(Ficha).
 
 /*
@@ -191,13 +217,13 @@ decrementa(X):-
  **/
 movimientosPosibles([]).
 movimientosPosibles([H|T]) :-
-    extremoDer(Y),
-    extremoIzq(X),
+    extremoDerecho(Y),
+    extremoIzquierdo(X),
     posibles(W),
     (member(X, H) ; member(Y,H)),
     append(W, [H], Z),
     retract(posibles(W)),
     assert(posibles(Z)),
-    movimientosPosibles(T).
+    movimientosPosibles(T),!.
 movimientosPosibles([_|T]):-
-movimientosPosibles(T).
+movimientosPosibles(T),!.

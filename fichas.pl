@@ -6,6 +6,7 @@
 :-dynamic extremoDerecho/1.
 :-dynamic extremoIzquierdo/1.
 :-dynamic pozo/1.
+:-dynamic posibles/1.
 
 desconocidas([0, 0]).
 desconocidas([1, 0]).
