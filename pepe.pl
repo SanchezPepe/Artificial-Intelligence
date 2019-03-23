@@ -144,8 +144,22 @@ busca:-
  * Min max
  * ['pepe.pl'].
  * movimientosPosibles([[5,4],[8,1], [4,2], [4,0], [1,4]]).
+
+https://es.wikipedia.org/wiki/Poda_alfa-beta
  * 
  **/
+/*La funcion heuristica recibe los parámetros de la funEstimadora y la funPasa, 
+los suma y regresa C. A es el número de fichas desconocidas, 
+B, el número de fichas en el pozo, 
+C es el número determinado del que quieres saber cuantas fichas quedan desconocidas. 
+E es la lista cuando ha pasado el rival, 
+ED el extremo derecho del tablero y EI, el izquierdo y S la suma de todo*/
+heuristica(C, S):-
+    numeros(Y), nth0(s,Y,D),
+    extremoDerecho(ED), extremoIzquierdo(EI),
+	length(desconocidas,A), pozo(B), notiene(E),
+    funEstimadora(A, B, D, X), funPasa(E, ED, Y),funPasa(E, EI, Z),
+	S is X+Y+Z.
 
 funcionPeso(X):-
     random(1, 10, X).
@@ -155,17 +169,48 @@ funcionPeso(X):-
  * LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
  * */
 % Caso en el que bajó hasta la profundidad deseada.
-alfabeta(_, Prof, _, _, _, Peso):-
-    Prof == 0,
-    funcionPeso(X),
-    Peso is X.
-alfabeta(Nodo, Prof, Alfa, Beta, Max, Peso):-
-    Max == MAX,
-    posibles(X).
-
+% alfabeta(Nodo, Profundidad, Alfa, Beta, Turno, Peso)
+alfabeta(Nodo, 0, _, _, _, Peso):-
+    funcionPeso(Nodo, Peso).
+% MAX
+alfabeta(Nodo, Prof, Alfa, Beta, 1, Peso):-
+    posibles(X),
     % For para cada hijo del nodo
-alfabeta(Nodo, Prof, Alfa, Beta, Max, Peso).
+    Alfa is max(Alfa, alfabeta(Hijo, Prof-1, Alfa, Beta, 0)),
+    Beta => Alfa,
+    poda(Beta),
+    Peso is Alfa.
+% MIN
+alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
+    posibles(X),
+    Beta is min(Beta, alfabeta(Hijo, Prof-1, Alfa, Beta, 1)),
+    Beta =< Alfa,
+    poda(Alfa),
+    Peso is Beta.
 
 
+max(X, Y, Z):-
+    Z is max(X, Y).
 
+min(X, Y, Z):-
+    Z is min(X, Y).
+
+
+/*la función estimadora recibe tres parámetros: ‘A’ que sería el num de fichas desconocidas, B el número de fichas en el pozo y C el número de fichas desconocidas de número determinado. Regresa D*/
+funEstimadora(A, B, C, D):-
+	(B=0) -> D is 0;
+	(B\=0) -> D is 2*(1-(C/A)).
+
+
+/*funMano([],_,_).
+funMano([A|ColaA], F, S):-
+    member(F, A), (S=0) -> S is S+1;
+    funMano(ColaA, F, S).*/
+
+/*La función recibe  la lista A que consiste en los casos qconocidos en los cuales el rival ha pasado, y el elemento B que es uno de los extremos del tablero, regresa C
+*/
+
+funPasa(A, B, C):-
+    member(B, A) -> C is 2;
+    C is 0.
 

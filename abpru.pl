@@ -52,17 +52,6 @@ alphaBeta(MisPiezas,Incognitas,Abiertas, [[Cab]|[]],Depth,Alpha,Beta,0,ValorH,Fc
     generaArbol(MisPiezas,Abiertas,Hijos),
     alphaBeta(MisPiezas,Incognitas,Abiertas, [[]|Hijos],Depth,Alpha,Beta,1,ValorH,Fcont).
 
-
-
-
-% alphaBeta([[[_,Val]|[]]],_,_,_,_,ValorH):-
-%     ValorH is Val,!.
-
-% alphaBeta([_|Node],0,_,_,_,ValorH):-
-%     ValorH is Node,!.
-
-
-
 alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,1,ValorH,Fcont):-
     generaArbol(MisPiezas,Abiertas,Hijos),
     append([Abiertas],Hijos,Arbol),
@@ -84,19 +73,6 @@ alphaBeta(MisPiezas,Incognitas,Abiertas, [_|Children],Depth,Alpha,Beta,1,ValorH,
 alphaBeta(MisPiezas,Incognitas,Abiertas,[_|Children],Depth,Alpha,Beta,0,ValorH,Fcont):-
     Value = [[]|Beta],
     forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValorH,Fcont).
- 
-
-% alphaBeta(MisPiezas,Incognitas,Abiertas,[_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH,Fcont):-
-%    alphaBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,Player,ValorH,Fcont),
-%    alphaBeta(MisPiezas,Incognitas,Abiertas,Cuerpo,Depth,Alpha,Beta,Player,ValorH,Fcont),!.
-
-% alphaBeta([_|[Children]],Depth,Alpha,Beta,1,ValorH):-
-%     Value is -5000,
-%     forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
-
-% alphaBeta([_|Children],Depth,Alpha,Beta,0,ValorH):-
-%     Value is 5000,
-%     forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
 
 
 forEachAlpha(_,_,_,_,_,Alpha,Beta,_,_):-
