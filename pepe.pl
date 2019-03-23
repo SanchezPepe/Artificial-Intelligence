@@ -1,42 +1,67 @@
 /**
-Al inicio el sistema recibe:
-    1.- Las fichas asignadas ------------ LISTO
-    2.- Quién tira primero - quién tuvo la mula más grande  ----- LISTO. Se indica por meido de turno(X). 
-       X = 1, es nuestro turno. X = 0, es turno del contrincante. Por default está en 1 al inicio del juego. 
 
 Funciones a implementar:
-    1.- Tomar del pozo (robar) ---------- LISTO
-    2.- Tirar ficha
-    3.- Tirar ficha rival -------------- LISTO
-    4.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo)
+    1.- Tirar ficha
+    2.- Tirar ficha rival usar decremento para controlar núms
+    3.- Función eurística (28-Tiradas-Mías= Fichas del Rival y pozo) 1/2
         a) Cuando el rival tome del pozo, guardar las fichas que no tiene
         b) Deshacerse lo más rápido posible de las mulas
         c) Mantener variada la mano de fichas
-    5.- Imprimir tablero ------------  LISTO
-    
-
-    Links
-    List sort: https://stackoverflow.com/questions/8429479/sorting-a-list-in-prolog
+    4.- Alpha beta
 **/
+
 :- ensure_loaded(fichas).
-:- dynamic posibles/1.
-
-tirar([3,4]).
-der(2).
-izq(3).
-
-mano2([[1,3],[4,0],[1,1],[5,3],[0,0]]).
-posibles([]).
-
 numeros([7,7,7,7,7,7,7]).
 
-/* Aqui le cargamos las fichas que nos reparten al inicio del juego. 
-Se tiene que llamar "inicio." e ingresar las 7 fichas, y posteriormente poner "fin.". */
+/* 
+    Para iniciar el juego se consulta "main.". Posteriormente, te pedirá las 7 fichas iniciales 
+    y se tendrán que meter en el formato "[a,b].". Después de ingresar la séptima ficha, se tendrá
+    que ingresar "fin.".
+    Después le tendremos que indicar al programa quién tiene el primer movimiento por medio de "yo."
+    o "el." En ambos casos, tenemos que ingresar cuál es la primera ficha del juego. 
+*/
+main:-
+    inicio,
+    mano(Z),
+    delete(Z, fin, Y),
+    retract(mano(Z)),
+    assert(mano(Y)),
+    write("¿Quién tiene el primer movimiento? yo/el"),nl,
+    read(Resp),
+    Resp==yo,
+    write("¿Cuál es la primera ficha que tiro? "),nl,
+    read(Ficha),
+    mano(X),
+    delete(X,Ficha,M),
+    retract(mano(X)),
+    assert(mano(M)),
+    actualizaPrim(Ficha),
+    tiroOponente.
+main:-
+    primerTiroOponente.
 
+/*
+    En caso de que empieze el oponente, esta regla recibe la ficha y llama otra regla que actualiza los
+    extremos del tablero. 
+*/
+primerTiroOponente:-
+    write("¿Qué ficha tiró el oponente?"),nl,
+    read(Ficha),
+    retract(desconocidas(Ficha)),
+    actualizaPrim(Ficha),tiro,!.
+
+
+/*
+    Cuando se llama esta regla, se pone un punto de retroceso.
+*/
 repite.
 repite:-
     repite.
 
+/*
+    Esta regla lee de la consola las 7 fichas iniciales y las ingresa a la lista guardada en el 
+    hecho "mano". Igualmente, cada que lee una ficha la quita del hecho "desconocidas".
+ */
 inicio():-
     write("Ingresa las 7 fichas iniciales. "),nl,
     repite,
@@ -46,44 +71,69 @@ inicio():-
     retract(mano(X)),
     assert(mano(Y)),
     retract(desconocidas(Ficha)),
-    Ficha==fin.
+    Ficha==fin,!.
 
+list_not_empty([_]).
+
+ladoFicha([_|[T]], SIDE):-
+    extremoDerecho(ED),
+    write(ED), nl, 
+    write(T == ED),
+    SIDE is 0, !.
+ladoFicha([H|_], SIDE):-
+    extremoIzquierdo(EI),
+    write(EI), nl, 
+    write(H == EI),
+    SIDE is 1, !.
+
+tiro:-
+    mano(X),
+    retractall(posibles(_)),
+    assert(posibles([])),
+    movimientosPosibles(X), %Cuando esté la poda, aquí se llamará y nos regresará un elemento Y
+    posibles([[A|B]|_]),
+    ladoFicha([A|B], Z),
+    list_not_empty([[A|B]|_]),
+    write("------------------- "),write([A|B]),nl,
+    delete(X,[A|B],M),
+    retract(mano(X)),
+    assert(mano(M)),
+    actualizaExtremo([A|B],Z),
+    tiroOponente.
+  
+tiro:-
+    roba.
+
+/*
+    Cuando no podeomos tirar ninguna ficha, se llama a "roba.". Primero, revisa si hay fichas en el pozo.
+    En caso positivo, pide y lee una ficha y la ingresa a la mano, la quita de desconocidas y resta una
+    unidad del pozo. 
+*/
 roba:-
    pozo(0),
-   pasa.
+   write("Pozo vacío, paso."),nl,
+   tiroOponente.
 roba:-
     write("Dame la ficha que robo. "),nl,
-    read(Ficha),
-    assert(mano(Ficha)),
-    retract(desconocidas(Ficha)).
-pasa:-
-    assert(turno(0)),
-    retractall(turno(1)).
-
-reverse([],Z,Z).
-reverse([H|T],Z,Acc):-
-    reverse(T,Z,[H|Acc]).
-
-extremoIzq():-
-    tablero([H|_]),
-    extremoIzq(H).
-extremoIzq([H|_]):-
-    retractall(extremoIzquierdo(_)),
-    assert(extremoIzquierdo(H)).
-
-extremoDer():-
-    tablero([_|T]),
-    reverse(T,X,[]),
-    extremoDer(X),!.
-extremoDer([H|_]):-
-    reverse(H,X,[]),
-    is_list(X),
-    extremoDer(X),!.
-extremoDer([H|_]):-
-    retractall(extremoDerecho(_)),
-    assert(extremoDerecho(H)).
-
-
+    read(Ficha), 
+    mano(X),   
+    append(X,[Ficha],Y),
+    retract(mano(X)),
+    assert(mano(Y)),
+    retract(desconocidas(Ficha)),
+    pozo(P),
+    A is P-1,
+    retract(pozo(P)),
+    assert(pozo(A)),
+    tiro.
+/*
+    En las primeras 3 filas de la regla, le ingresamos al programa si el oponente tiró alguna ficha o no.
+    En caso afirmativo, ingresamos por medio de la consola qué ficha tiró, de qué lado del tablero la tiró.
+    Después, se llama a una regla que actualiza los extremos.
+    En caso negativo (el oponente no tira ninguna ficha) ingresamos cuántas fichas robó del pozo y 
+    actualizamos el número de fichas en el pozo. Finalmente, ingresamos los valores de los extremos el
+    tablero a un hecho llamado "noTiene" para guardar cuáles son los valores que hacen pasar al oponente. 
+*/
 tiroOponente:-
     write("¿El oponente tiró alguna ficha? si/no"),nl,
     read(Resp),
@@ -91,12 +141,59 @@ tiroOponente:-
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
     retract(desconocidas(Ficha)),
-    tablero(X),
-    append(X,[Ficha],Y),
-    retract(tablero(X)),
-    assert(tablero(Y)),
-    extremoDer,
-    extremoIzq.
+    write("¿De qué lado del tablero tiró el oponente? d/i"),nl,
+    read(Lado),
+    actualizaExtremo(Ficha, Lado),tiro.
+tiroOponente:-    
+    write("¿Cuántas fichas tomó del pozo? "),nl,
+    read(Num),
+    pozo(X),
+    Y is X-Num,
+    retract(pozo(X)),
+    assert(pozo(Y)),        
+    extremoDerecho(ValDer),
+    extremoIzquierdo(ValIzq),
+    noTiene(N),
+    append(N, [ValIzq], S),
+    append(S, [ValDer], Z),
+    retract(noTiene(N)),
+    assert(noTiene(Z)),tiro.
+
+/*
+    Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
+*/
+actualizaPrim([A|ColaA]):-
+     sacaCola(ColaA,B),assert(extremoDerecho(B)),
+     assert(extremoIzquierdo(A)).
+
+/*
+    Esta regla se llama cada que alguien tira una ficha, y se encarga de actualizar los extremos del tablero.
+*/
+actualizaExtremo(Ficha, Lado):-
+    (Lado=1) -> actEI(Ficha);
+    actED(Ficha).
+
+/*
+    Esta regla te regresa la cola de una lista.
+*/
+sacaCola([A|_],B):-
+    B is A.
+
+/*
+    Esta regla actualiza el extremo derecho del tablero.
+*/
+actED([A|ColaA]):-
+    extremoDerecho(ED),
+    (A==ED)->retractall(extremoDerecho(_)), sacaCola(ColaA,B),assert(extremoDerecho(B));
+    retractall(extremoDerecho(_)),assert(extremoDerecho(A)).
+
+/*
+    Esta regla actualiza el extremo izquierdo del tablero.
+*/
+actEI([A|ColaA]):-
+    extremoIzquierdo(EI),
+    (A==EI)->retractall(extremoIzquierdo(_)),sacaCola(ColaA,B),assert(extremoIzquierdo(B));
+    retractall(extremoIzquierdo(_)),assert(extremoIzquierdo(A)).
 
 /**
  * Regla que decrementa la lista que guarda cuántas fichas quedan de cada grupo, se utliza en la 
@@ -113,6 +210,24 @@ decrementa(X):-
     nth0(X, B, A, W),
     retract(numeros(Y)),
     assert(numeros(B)).
+
+/**
+ * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
+ * Regresa una sublista posibles([]) de la mano actual
+ **/
+movimientosPosibles([]).
+movimientosPosibles([H|T]) :-
+    extremoDerecho(Y),
+    extremoIzquierdo(X),
+    posibles(W),
+    (member(X, H) ; member(Y,H)),
+    append(W, [H], Z),
+    retract(posibles(W)),
+    assert(posibles(Z)),
+    movimientosPosibles(T),!.
+movimientosPosibles([_|T]):-
+movimientosPosibles(T),!.
+
 
 /**
  * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
@@ -152,15 +267,9 @@ https://es.wikipedia.org/wiki/Poda_alfa-beta
 los suma y regresa C. A es el número de fichas desconocidas, 
 B, el número de fichas en el pozo, 
 C es el número determinado del que quieres saber cuantas fichas quedan desconocidas. 
-E es la lista cuando ha pasado el rival, 
+E es la lista cuando ha pa
+sado el rival, 
 ED el extremo derecho del tablero y EI, el izquierdo y S la suma de todo*/
-heuristica(C, S):-
-    numeros(Y), nth0(s,Y,D),
-    extremoDerecho(ED), extremoIzquierdo(EI),
-	length(desconocidas,A), pozo(B), notiene(E),
-    funEstimadora(A, B, D, X), funPasa(E, ED, Y),funPasa(E, EI, Z),
-	S is X+Y+Z.
-
 funcionPeso(X):-
     random(1, 10, X).
 
@@ -177,7 +286,7 @@ alfabeta(Nodo, Prof, Alfa, Beta, 1, Peso):-
     posibles(X),
     % For para cada hijo del nodo
     Alfa is max(Alfa, alfabeta(Hijo, Prof-1, Alfa, Beta, 0)),
-    Beta => Alfa,
+    Alfa =< Beta,
     poda(Beta),
     Peso is Alfa.
 % MIN
@@ -188,7 +297,6 @@ alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
     poda(Alfa),
     Peso is Beta.
 
-
 max(X, Y, Z):-
     Z is max(X, Y).
 
@@ -196,10 +304,17 @@ min(X, Y, Z):-
     Z is min(X, Y).
 
 
-/*la función estimadora recibe tres parámetros: ‘A’ que sería el num de fichas desconocidas, B el número de fichas en el pozo y C el número de fichas desconocidas de número determinado. Regresa D*/
-funEstimadora(A, B, C, D):-
-	(B=0) -> D is 0;
-	(B\=0) -> D is 2*(1-(C/A)).
+/* Regla que estima la posibilidad de que el rival no tenga un número determinado,
+ * recibe el número de fichas desconocidas totales. Utilizar para generar la estimación
+ * la lista queg guarda cuantas fichas de cada grupo aún se desconocen.
+ */
+estimacion(Num, Est):-
+    length(desconocidas, Desc), 
+    pozo(TamPozo),
+    numeros(Y),
+    nth0(Num, Y, X),
+	(TamPozo = 0) -> Est is 0;
+	(TamPozo \= 0) -> Est is 2*(1-(X/Desc)).
 
 
 /*funMano([],_,_).
@@ -207,10 +322,19 @@ funMano([A|ColaA], F, S):-
     member(F, A), (S=0) -> S is S+1;
     funMano(ColaA, F, S).*/
 
-/*La función recibe  la lista A que consiste en los casos qconocidos en los cuales el rival ha pasado, y el elemento B que es uno de los extremos del tablero, regresa C
-*/
+/** Regla que pondera un número con las fichas que el rival no tiene, La función recibe la lista A que contiene los números en los que el rival pasó 
+ *  ha pasado, y el elemento B que es uno de los extremos del tablero, regresa C.
+**/
+rivalPaso(Num, Resp):-
+    noTiene(X),
+    member(Num, X) -> Resp is 2;
+    Resp is 0.
 
-funPasa(A, B, C):-
-    member(B, A) -> C is 2;
-    C is 0.
-
+funcionPeso(C, S):-
+    numeros(Y), 
+    extremoDerecho(ED), 
+    extremoIzquierdo(EI),
+    rivalPaso(ED, Y),
+    rivalPaso(EI, Z),
+    estimacion(C, X),
+	S is X+Y+Z.

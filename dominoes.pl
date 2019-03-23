@@ -279,7 +279,6 @@ funcionPeso(X):-
  * */
 % Caso en el que bajó hasta la profundidad deseada.
 % alfabeta(Nodo, Profundidad, Alfa, Beta, Turno, Peso)
-/**
 alfabeta(Nodo, 0, _, _, _, Peso):-
     funcionPeso(Nodo, Peso).
 % MAX
@@ -297,7 +296,6 @@ alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
     Beta =< Alfa,
     poda(Alfa),
     Peso is Beta.
-*/
 
 max(X, Y, Z):-
     Z is max(X, Y).
@@ -306,11 +304,10 @@ min(X, Y, Z):-
     Z is min(X, Y).
 
 
-/* La siguiente regla estima la posibilidad de que el rival no tenga un número determinado,
- * recibe el número de fichas desconocida totaestimadora recibe tres parámetros: ‘A’ que sería el num de fichas 
- * desconocidas, B el número de fichas en el pozo y C el número de fichas desconocidas 
- * de número determinado. Regresa D
- **/
+/* Regla que estima la posibilidad de que el rival no tenga un número determinado,
+ * recibe el número de fichas desconocidas totales. Utilizar para generar la estimación
+ * la lista queg guarda cuantas fichas de cada grupo aún se desconocen.
+ */
 estimacion(Num, Est):-
     length(desconocidas, Desc), 
     pozo(TamPozo),
@@ -333,7 +330,7 @@ rivalPaso(Num, Resp):-
     member(Num, X) -> Resp is 2;
     Resp is 0.
 
-heuristica(C, S):-
+funcionPeso(C, S):-
     numeros(Y), 
     extremoDerecho(ED), 
     extremoIzquierdo(EI),
