@@ -1,5 +1,5 @@
-/**
 
+/**
 Funciones a implementar:
     1.- Tirar ficha
     2.- Tirar ficha rival usar decremento para controlar núms
@@ -75,16 +75,15 @@ inicio():-
 
 list_not_empty([_]).
 
-ladoFicha([_|[T]], SIDE):-
+ladoFicha(X, SIDE):-
     extremoDerecho(ED),
-    write(ED), nl, 
-    write(T == ED),
-    SIDE is 0, !.
-ladoFicha([H|_], SIDE):-
-    extremoIzquierdo(EI),
-    write(EI), nl, 
-    write(H == EI),
-    SIDE is 1, !.
+    member(ED,X),
+    SIDE is 0,
+    write("Se tiro del lado derecho. "),nl,!.
+ladoFicha(_,SIDE):-
+    SIDE is 1,
+    write("Se tiro del lado izquierdo. "),nl,!.
+
 
 tiro:-
     mano(X),
@@ -92,8 +91,8 @@ tiro:-
     assert(posibles([])),
     movimientosPosibles(X), %Cuando esté la poda, aquí se llamará y nos regresará un elemento Y
     posibles([[A|B]|_]),
-    ladoFicha([A|B], Z),
     list_not_empty([[A|B]|_]),
+    ladoFicha([A|B], Z),    
     write("------------------- "),write([A|B]),nl,
     delete(X,[A|B],M),
     retract(mano(X)),
@@ -227,3 +226,105 @@ movimientosPosibles([H|T]) :-
     movimientosPosibles(T),!.
 movimientosPosibles([_|T]):-
 movimientosPosibles(T),!.
+
+
+/**
+ * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
+ * Regresa una sublista posibles([]) de la mano actual
+ **/
+/**
+movimientosPosibles([], _).
+movimientosPosibles([H|_], Z):-
+    der(Y),
+    izq(X),
+    (member(X, H) ; member(Y,H)),
+    append(Z, [H], R),
+    movimientosPosibles(T, R),
+    Z = R, !.
+movimientosPosibles([_|T], Z):-
+    movimientosPosibles(T, Z), !.
+mano3([[3,2], [6,2], [4,7], [3,0]]).
+m3([4,2,3,3,3,3]).
+l([2,3]).
+busca:-
+    mano3(X),
+    %l(Y),
+    movimientosPosibles(X, Y),
+    write(Y).
+**/
+/**
+ * Min max
+ * ['pepe.pl'].
+ * movimientosPosibles([[5,4],[8,1], [4,2], [4,0], [1,4]]).
+https://es.wikipedia.org/wiki/Poda_alfa-beta
+ * 
+ **/
+/*La funcion heuristica recibe los parámetros de la funEstimadora y la funPasa, 
+los suma y regresa C. A es el número de fichas desconocidas, 
+B, el número de fichas en el pozo, 
+C es el número determinado del que quieres saber cuantas fichas quedan desconocidas. 
+E es la lista cuando ha pa
+sado el rival, 
+ED el extremo derecho del tablero y EI, el izquierdo y S la suma de todo*/
+funcionPeso(X):-
+    random(1, 10, X).
+
+/**
+ * POSIBLES = [[5,4],[8,1], [4,2], [4,0], [1,4]]
+ * LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
+ * */
+% Caso en el que bajó hasta la profundidad deseada.
+% alfabeta(Nodo, Profundidad, Alfa, Beta, Turno, Peso)
+/**
+alfabeta(Nodo, 0, _, _, _, Peso):-
+    funcionPeso(Nodo, Peso).
+% MAX
+alfabeta(Nodo, Prof, Alfa, Beta, 1, Peso):-
+    posibles(X),
+    % For para cada hijo del nodo
+    Alfa is max(Alfa, alfabeta(Hijo, Prof-1, Alfa, Beta, 0)),
+    Alfa =< Beta,
+    poda(Beta),
+    Peso is Alfa.
+% MIN
+alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
+    posibles(X),
+    Beta is min(Beta, alfabeta(Hijo, Prof-1, Alfa, Beta, 1)),
+    Beta =< Alfa,
+    poda(Alfa),
+    Peso is Beta.
+*/
+
+max(X, Y, Z):-
+    Z is max(X, Y).
+
+min(X, Y, Z):-
+    Z is min(X, Y).
+
+
+/* La siguiente regla estima la posibilidad de que el rival no tenga un número determinado,
+ * recibe el número de fichas desconocida totaestimadora recibe tres parámetros: ‘A’ que sería el num de fichas 
+ * desconocidas, B el número de fichas en el pozo y C el número de fichas desconocidas 
+ * de número determinado. Regresa D
+ **/
+estimacion(Num, Est):-
+    length(desconocidas, Desc), 
+    pozo(TamPozo),
+    numeros(Y),
+    nth0(Num, Y, X),
+	(TamPozo = 0) -> Est is 0;
+	(TamPozo \= 0) -> Est is 2*(1-(X/Desc)).
+
+
+/*funMano([],_,_).
+funMano([A|ColaA], F, S):-
+    member(F, A), (S=0) -> S is S+1;
+    funMano(ColaA, F, S).*/
+
+/** Regla que pondera un número con las fichas que el rival no tiene, La función recibe la lista A que contiene los números en los que el rival pasó 
+ *  ha pasado, y el elemento B que es uno de los extremos del tablero, regresa C.
+**/
+rivalPaso(Num, Resp):-
+    noTiene(X),
+    member(Num, X) -> Resp is 2;
+    Resp is 0.
