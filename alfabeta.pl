@@ -1,36 +1,45 @@
-/*La funcion heuristica recibe los parámetros de la funEstimadora y la funPasa, 
-los suma y regresa C. A es el número de fichas desconocidas, 
-B, el número de fichas en el pozo, 
-C es el número determinado del que quieres saber cuantas fichas quedan desconocidas. 
-E es la lista cuando ha pa
-sado el rival, 
-ED el extremo derecho del tablero y EI, el izquierdo y S la suma de todo*/
-funcionPeso(X):-
-    random(1, 10, X).
+:- ensure_loaded(pepe).
 
-/**
- * POSIBLES = [[5,4],[8,1], [4,2], [4,0], [1,4]]
- * LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
- * */
+%LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
+
+
 % Caso en el que bajó hasta la profundidad deseada.
-% alfabeta(Nodo, Profundidad, Alfa, Beta, Turno, Peso)
 alfabeta(Nodo, 0, _, _, _, Peso):-
-    funcionPeso(Nodo, Peso).
+    pesoNodo(Nodo, Peso).
 % MAX
 alfabeta(Nodo, Prof, Alfa, Beta, 1, Peso):-
     posibles(X),
-    % For para cada hijo del nodo
-    Alfa is max(Alfa, alfabeta(Hijo, Prof-1, Alfa, Beta, 0)),
+    ProfR is Prof-1,
+    % PARA CADA HIJO DEL NODO
+    alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
+    Alfa is max(Alfa, Peso2),
     Alfa =< Beta,
     poda(Beta),
+    % PARA CADA HIJO DEL NODO
     Peso is Alfa.
 % MIN
 alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
     posibles(X),
-    Beta is min(Beta, alfabeta(Hijo, Prof-1, Alfa, Beta, 1)),
+    ProfR is Prof-1,
+    % PARA CADA HIJO DEL NODO
+    alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
+    Beta is min(Beta, Peso2),
     Beta =< Alfa,
     poda(Alfa),
+    % PARA CADA HIJO DEL NODO
     Peso is Beta.
+
+/**
+ * Funciones Auxiliares
+ * **/
+
+manoCompatible(C):-
+    mano(X),
+    fichasCompatibles(X, C).
+
+desconocidasCompatibles(D):-
+    desconocidas(X),
+    fichasCompatibles(X, D).
 
 max(X, Y, Z):-
     Z is max(X, Y).
@@ -38,31 +47,51 @@ max(X, Y, Z):-
 min(X, Y, Z):-
     Z is min(X, Y).
 
-/* Regla que estima la posibilidad de que el rival no tenga un número determinado,
- * recibe el número de fichas desconocidas totales. Utilizar para generar la estimación
- * la lista queg guarda cuantas fichas de cada grupo aún se desconocen.
- */
-estimacion(Num, Est):-
-    length(desconocidas, Desc), 
-    pozo(TamPozo),
-    numeros(Y),
-    nth0(Num, Y, X),
-	(TamPozo = 0) -> Est is 0;
-	(TamPozo \= 0) -> Est is 2*(1-(X/Desc)).
+fichaCompatible([H|[T|_]]):-
+    tablero(X),
+    (member(H, X) ; member(T, X)).
 
-/** Regla que pondera un número con las fichas que el rival no tiene, La función recibe la lista A que contiene los números en los que el rival pasó 
- *  ha pasado, y el elemento B que es uno de los extremos del tablero, regresa C.
-**/
-rivalPaso(Num, Resp):-
-    noTiene(X),
-    member(Num, X) -> Resp is 2;
-    Resp is 0.
+fichasCompatibles([],[]).
+fichasCompatibles([H|T], X):-
+    fichaCompatible(H),
+    fichasCompatibles(T, Z),
+    append([H], Z, X).
+fichasCompatibles([_|T], X):-
+    fichasCompatibles(T, X). 
 
-funcionPeso(C, S):-
+/**
+ * Regla que asigna un peso a un nodo determinado dependiendo del estado actual del
+ * juego, para la determinación del peso se consideran las fichas que el sistema
+ * desconoce, el número de fichas en el pozo, cúantas fichas compatibles con el 
+ * tablero quedan todavía y las fichas que sabemos que el rival no tiene por que
+ * ha pasado.
+ * **/
+pesoNodo(Nodo, S):-
     numeros(Y), 
     extremoDerecho(ED), 
     extremoIzquierdo(EI),
     rivalPaso(ED, Y),
     rivalPaso(EI, Z),
-    estimacion(C, X),
-	S is X+Y+Z.
+    estimacion(Nodo, X),
+	S is (2*X)+Y+Z.
+
+/**
+ * Regla que evalua si el rival no tiene un número (la lista 'noTiene' registra 
+ * cuando el rival toma del pozo o pasa)
+ * **/
+rivalPaso(Num, Resp):-
+    noTiene(X),
+    member(Num, X) -> Resp is 2;
+    Resp is 0.
+
+/* Regla que estima la posibilidad de que el rival no tenga un número determinado,
+ * recibe el número de fichas desconocidas totales. Utilizar para generar la estimación
+ * la lista queg guarda cuantas fichas de cada grupo aún se desconocen.
+ */
+estimacion(Num, Est):-
+    length(desconocidas, Desc),
+    pozo(TamPozo),
+    numeros(Y),
+    nth0(Num, Y, X),
+	(TamPozo = 0) -> Est is 0;
+	(TamPozo \= 0) -> Est is (1-(X/Desc)).

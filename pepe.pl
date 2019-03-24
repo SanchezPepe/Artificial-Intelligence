@@ -15,7 +15,6 @@ Funciones a implementar:
 :-dynamic tablero/1.    
 :-dynamic pozo/1.
 
-
 desconocidas([[0, 0],
             [1, 0],[1, 1],
             [2, 0],[2, 1],[2, 2],
@@ -245,38 +244,4 @@ movimientosPosibles([H|T]) :-
     movimientosPosibles(T),!.
 movimientosPosibles([_|T]):-
 movimientosPosibles(T),!.
-
-
-/**
- * Regla que busca las fichas posibles para tirar en cada jugada dependiendo del estado actual del tablero.
- * Regresa una sublista posibles([]) de la mano actual
- **/
-/**
-movimientosPosibles([], _).
-movimientosPosibles([H|_], Z):-
-    der(Y),
-    izq(X),
-    (member(X, H) ; member(Y,H)),
-    append(Z, [H], R),
-    movimientosPosibles(T, R),
-    Z = R, !.
-movimientosPosibles([_|T], Z):-
-    movimientosPosibles(T, Z), !.
-
-mano3([[3,2], [6,2], [4,7], [3,0]]).
-m3([4,2,3,3,3,3]).
-l([2,3]).
-busca:-
-    mano3(X),
-    %l(Y),
-    movimientosPosibles(X, Y),
-    write(Y).
-
-**/
-/**
- * Min max
- * ['pepe.pl'].
- * movimientosPosibles([[5,4],[8,1], [4,2], [4,0], [1,4]]).
-
-https://es.wikipedia.org/wiki/Poda_alfa-beta
 
