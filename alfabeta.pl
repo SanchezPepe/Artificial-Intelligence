@@ -1,30 +1,59 @@
 :- ensure_loaded(pepe).
 
+n([7,7,7,7,7,7,7]).
+% Para pruebas
+ma([[5,2],[8,1], [4,2], [4,0], [1,4]]).
+%manoCompatible([2,1], [[5,2],[8,1], [4,2], [4,0], [1,4]], C).
+
+decrementaListaAux(Index, Lista, Ret):-
+    % Obtiene de la lista
+    nth0(Index,Lista,Cant),
+    % Quita de la lista
+    nth1(Index,Lista, _, W),
+    Dec is Cant-1,
+    % Inserta en la lsita
+    nth0(Index, Nva, Dec, W),
+    append(Nva, [], Ret).
+
+
+bestMove(Nodo, Prof, Ficha):-
+    alfabeta(Nodo, Prof,-50, 50, 1, Peso),
+    write('Mi tiro es: '+ Peso),
+    Ficha is Peso.
+
+
+
+%Para cada hijo del nodo
+%iteraNodosHijo(_,_,0, Peso):-
+% iteraNodosHijo(TABLERO, COMPATIBLES, PROFUNDIDAD, PESO).
+iteraNodosHijo(_,[], _, _).    
+iteraNodosHijo(Nodo, [Ficha|Resto], Prof, Peso):-
+    manoCompatible(Tab, Ficha, [H|T]).  %Tiene las fichas compatibles con Nodo.
+
+
 %LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
-
-
-% Caso en el que bajó hasta la profundidad deseada.
-alfabeta(Nodo, 0, _, _, _, Peso):-
+abp(Nodo, 0, _, _, _, Peso):-
     pesoNodo(Nodo, Peso).
 % MAX
-alfabeta(Nodo, Prof, Alfa, Beta, 1, Peso):-
-    posibles(X),
+abp(Nodo, Prof, Alfa, Beta, 1, Peso):-
     ProfR is Prof-1,
+    desconocidas(D),
+    desconocidasCompatibles(Nodo, [DescComp|Resto]),
     % PARA CADA HIJO DEL NODO
     alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
     Alfa is max(Alfa, Peso2),
-    Alfa =< Beta,
-    poda(Beta),
-    % PARA CADA HIJO DEL NODO
+    Alfa >= Beta,
+    %poda(Beta)
     Peso is Alfa.
 % MIN
-alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
-    posibles(X),
+abp(Nodo, Prof, Alfa, Beta, 0, Peso):-
     ProfR is Prof-1,
+    mano(Mano),
+    manoCompatible(Nodo, Mano, [Compat|Resto]),
     % PARA CADA HIJO DEL NODO
     alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
     Beta is min(Beta, Peso2),
-    Beta =< Alfa,
+    Alfa >= Beta,
     poda(Alfa),
     % PARA CADA HIJO DEL NODO
     Peso is Beta.
@@ -32,14 +61,15 @@ alfabeta(Nodo, Prof, Alfa, Beta, 0, Peso):-
 /**
  * Funciones Auxiliares
  * **/
+/**
+ * Fichas compatibles para una mano determinada
+ * **/
+manoCompatible(Tab, Mano, Compat):-
+    fichasCompatibles(Tab, Mano, Compat), !.
 
-manoCompatible(C):-
-    mano(X),
-    fichasCompatibles(X, C).
-
-desconocidasCompatibles(D):-
+desconocidasCompatibles(Tab, Desc):-
     desconocidas(X),
-    fichasCompatibles(X, D).
+    fichasCompatibles(Tab, X, Desc), !.
 
 max(X, Y, Z):-
     Z is max(X, Y).
@@ -47,17 +77,16 @@ max(X, Y, Z):-
 min(X, Y, Z):-
     Z is min(X, Y).
 
-fichaCompatible([H|[T|_]]):-
-    tablero(X),
-    (member(H, X) ; member(T, X)).
+fichaCompatible(Tablero, [H|[T|_]]):-
+    (member(H, Tablero) ; member(T, Tablero)).
 
-fichasCompatibles([],[]).
-fichasCompatibles([H|T], X):-
-    fichaCompatible(H),
-    fichasCompatibles(T, Z),
+fichasCompatibles(_,[],[]).
+fichasCompatibles(Tablero, [H|T], X):-
+    fichaCompatible(Tablero, H),
+    fichasCompatibles(Tablero, T, Z),
     append([H], Z, X).
-fichasCompatibles([_|T], X):-
-    fichasCompatibles(T, X). 
+fichasCompatibles(Tablero,[_|T], X):-
+    fichasCompatibles(Tablero, T, X). 
 
 /**
  * Regla que asigna un peso a un nodo determinado dependiendo del estado actual del
@@ -86,7 +115,7 @@ rivalPaso(Num, Resp):-
 
 /* Regla que estima la posibilidad de que el rival no tenga un número determinado,
  * recibe el número de fichas desconocidas totales. Utilizar para generar la estimación
- * la lista queg guarda cuantas fichas de cada grupo aún se desconocen.
+ * la lista que guarda cuantas fichas de cada grupo aún se desconocen.
  */
 estimacion(Num, Est):-
     length(desconocidas, Desc),
@@ -95,3 +124,24 @@ estimacion(Num, Est):-
     nth0(Num, Y, X),
 	(TamPozo = 0) -> Est is 0;
 	(TamPozo \= 0) -> Est is (1-(X/Desc)).
+
+% Estimación
+funEstimadora(Desconocidas, NumPozo, QuedanNum, Estimacion):-
+	(NumPozo = 0) -> Estimacion is 0;
+	(NumPozo \= 0) -> Estimacion is (1-(QuedanNum/Desconocidas)).
+
+% Rival pasó
+funPasa(_,[], 0):- !.
+funPasa(RivalPaso, [H|T], Ans):-
+    member(H, RivalPaso),
+    funPasa(RivalPaso, T, Resp),
+    Ans is 2 + Resp, !.
+funPasa(RivalPaso, [_|T], Ans):-
+    funPasa(RivalPaso, T, Ans).
+
+% PESO
+heuristica(Desconocidas, NumPozo, NumTablero, Ficha, Peso):-
+    noTiene(N),
+    funEstimadora(Desconocidas, NumPozo, NumTablero, Estimacion), 
+    funPasa(N, Ficha, NoTiene),
+	Peso is (2*Estimacion) + NoTiene.
