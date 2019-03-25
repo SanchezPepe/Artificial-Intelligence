@@ -1,5 +1,5 @@
-/**
 
+/**
 Funciones a implementar:
     1.- Tirar ficha
     2.- Tirar ficha rival usar decremento para controlar núms
@@ -11,7 +11,17 @@ Funciones a implementar:
 **/
 
 :- ensure_loaded(fichas).
-numeros([7,7,7,7,7,7,7]).
+numeros([8,8,8,8,8,8,8]).
+:-dynamic numeros/1.
+:-dynamic desconocidas/1.
+
+desconocidas([[0, 0],
+            [1, 0],[1, 1],
+            [2, 0],[2, 1],[2, 2],
+            [3, 0],[3, 1],[3, 2],[3, 3],
+            [4, 0],[4, 1],[4, 2],[4, 3],[4, 4],
+            [5, 0],[5, 1],[5, 2],[5, 3],[5, 4],[5, 5],
+            [6, 0],[6, 1],[6, 2],[6, 3],[6, 4],[6, 5],[6, 6]]).
 
 /* 
     Para iniciar el juego se consulta "main.". Posteriormente, te pedirá las 7 fichas iniciales 
@@ -36,6 +46,8 @@ main:-
     retract(mano(X)),
     assert(mano(M)),
     actualizaPrim(Ficha),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
     tiroOponente.
 main:-
     primerTiroOponente.
@@ -44,10 +56,15 @@ main:-
     En caso de que empieze el oponente, esta regla recibe la ficha y llama otra regla que actualiza los
     extremos del tablero. 
 */
-primerTiroOponente:-
+primerTiroOponente:-    
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
     actualizaPrim(Ficha),tiro,!.
 
 
@@ -70,21 +87,23 @@ inicio():-
     append(X,[Ficha],Y),
     retract(mano(X)),
     assert(mano(Y)),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     Ficha==fin,!.
 
 list_not_empty([_]).
 
-ladoFicha([_|[T]], SIDE):-
+ladoFicha(X, SIDE):-
     extremoDerecho(ED),
-    write(ED), nl, 
-    write(T == ED),
-    SIDE is 0, !.
-ladoFicha([H|_], SIDE):-
-    extremoIzquierdo(EI),
-    write(EI), nl, 
-    write(H == EI),
-    SIDE is 1, !.
+    member(ED,X),
+    SIDE is 0,
+    write("Se tiro del lado derecho. "),nl,!.
+ladoFicha(_,SIDE):-
+    SIDE is 1,
+    write("Se tiro del lado izquierdo. "),nl,!.
+
 
 tiro:-
     mano(X),
@@ -92,13 +111,15 @@ tiro:-
     assert(posibles([])),
     movimientosPosibles(X), %Cuando esté la poda, aquí se llamará y nos regresará un elemento Y
     posibles([[A|B]|_]),
-    ladoFicha([A|B], Z),
     list_not_empty([[A|B]|_]),
+    ladoFicha([A|B], Z),    
     write("------------------- "),write([A|B]),nl,
     delete(X,[A|B],M),
     retract(mano(X)),
     assert(mano(M)),
     actualizaExtremo([A|B],Z),
+    sacaCola2([A|B],C),
+    decrementa(A),decrementa(C),
     tiroOponente.
   
 tiro:-
@@ -120,7 +141,10 @@ roba:-
     append(X,[Ficha],Y),
     retract(mano(X)),
     assert(mano(Y)),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     pozo(P),
     A is P-1,
     retract(pozo(P)),
@@ -140,10 +164,16 @@ tiroOponente:-
     Resp==si,
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     write("¿De qué lado del tablero tiró el oponente? d/i"),nl,
     read(Lado),
-    actualizaExtremo(Ficha, Lado),tiro.
+    actualizaExtremo(Ficha, Lado),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
+    tiro.
 tiroOponente:-    
     write("¿Cuántas fichas tomó del pozo? "),nl,
     read(Num),
@@ -157,7 +187,8 @@ tiroOponente:-
     append(N, [ValIzq], S),
     append(S, [ValDer], Z),
     retract(noTiene(N)),
-    assert(noTiene(Z)),tiro.
+    assert(noTiene(Z)),
+    tiro.
 
 /*
     Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
@@ -178,14 +209,28 @@ actualizaExtremo(Ficha, Lado):-
 */
 sacaCola([A|_],B):-
     B is A.
+sacaCola2([_|A],B):-
+    B is A.
 
 /*
     Esta regla actualiza el extremo derecho del tablero.
 */
-actED([A|ColaA]):-
+
+actED([A|[ColaA]]):-
     extremoDerecho(ED),
-    (A==ED)->retractall(extremoDerecho(_)), sacaCola(ColaA,B),assert(extremoDerecho(B));
-    retractall(extremoDerecho(_)),assert(extremoDerecho(A)).
+    ED==A,
+    retractall(extremoDerecho(_)),
+    retractall(extremoDerecho(_)),
+    assert(extremoDerecho(ColaA)),!.
+actED([A|_]):-
+    retractall(extremoDerecho(_)),
+    retractall(extremoDerecho(_)),
+    assert(extremoDerecho(A)),!.
+
+test:-
+    actED([6,1]),
+    extremoDerecho(X),
+write(X).
 
 /*
     Esta regla actualiza el extremo izquierdo del tablero.
@@ -204,7 +249,8 @@ decrementa(X):-
     % Obtiene de la lista
     nth0(X,Y,Z),
     % Quita de la lista
-    nth1(X,Y, _, W),
+    I is X+1,
+    nth1(I,Y, _, W),
     A is Z-1,
     % Inserta en la lsita
     nth0(X, B, A, W),
@@ -244,7 +290,6 @@ movimientosPosibles([H|_], Z):-
     Z = R, !.
 movimientosPosibles([_|T], Z):-
     movimientosPosibles(T, Z), !.
-
 mano3([[3,2], [6,2], [4,7], [3,0]]).
 m3([4,2,3,3,3,3]).
 l([2,3]).
@@ -253,13 +298,11 @@ busca:-
     %l(Y),
     movimientosPosibles(X, Y),
     write(Y).
-
 **/
 /**
  * Min max
  * ['pepe.pl'].
  * movimientosPosibles([[5,4],[8,1], [4,2], [4,0], [1,4]]).
-
 https://es.wikipedia.org/wiki/Poda_alfa-beta
  * 
  **/
@@ -332,12 +375,3 @@ rivalPaso(Num, Resp):-
     noTiene(X),
     member(Num, X) -> Resp is 2;
     Resp is 0.
-
-heuristica(C, S):-
-    numeros(Y), 
-    extremoDerecho(ED), 
-    extremoIzquierdo(EI),
-    rivalPaso(ED, Y),
-    rivalPaso(EI, Z),
-    estimacion(C, X),
-	S is X+Y+Z.
