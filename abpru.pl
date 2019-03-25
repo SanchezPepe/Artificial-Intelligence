@@ -18,8 +18,7 @@ choose_move(Depth, Position, computer, Move):-
 choose_move(Depth, Position, opponent, Move):-
   write(`Choose your move: `),
   fread(i, 0, 0, Move), nl,
-  move(Position, Move, _), !
-  ;
+  move(Position, Move, _), !;
   write(`***Invalid move***`), nl, nl,
   choose_move(Depth, Position, opponent, Move).
 

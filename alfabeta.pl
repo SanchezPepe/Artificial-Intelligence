@@ -15,20 +15,23 @@ decrementaListaAux(Index, Lista, Ret):-
     nth0(Index, Nva, Dec, W),
     append(Nva, [], Ret).
 
-
 bestMove(Nodo, Prof, Ficha):-
     alfabeta(Nodo, Prof,-50, 50, 1, Peso),
     write('Mi tiro es: '+ Peso),
     Ficha is Peso.
 
+mejorMov(Compat, Prof, Alfa, Beta, Valor):-
+    abp(Compat, Prof, Alfa, Beta, 0, Peso),
+    Valor is Peso,
+    poda(Nodo, Valor, Prof, Alfa, Beta).
 
+%% PARA CADA NODO HIJO
+% itera(NODO, LISTADELISTAS, PROFUNDIDAD, ALFA, BETA, PESO).
+itera(_, [], _, _, _, _).
+itera(Nodo, [H|T], Profundidad, Alfa, Beta, 0):-
+    NvaProf is Profundidad-1,
+    abp(Nodo, T, NvaProf, Alfa, Beta, 0, Peso),
 
-%Para cada hijo del nodo
-%iteraNodosHijo(_,_,0, Peso):-
-% iteraNodosHijo(TABLERO, COMPATIBLES, PROFUNDIDAD, PESO).
-iteraNodosHijo(_,[], _, _).    
-iteraNodosHijo(Nodo, [Ficha|Resto], Prof, Peso):-
-    manoCompatible(Tab, Ficha, [H|T]).  %Tiene las fichas compatibles con Nodo.
 
 
 %LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
@@ -38,9 +41,8 @@ abp(Nodo, 0, _, _, _, Peso):-
 abp(Nodo, Prof, Alfa, Beta, 1, Peso):-
     ProfR is Prof-1,
     desconocidas(D),
-    desconocidasCompatibles(Nodo, [DescComp|Resto]),
-    % PARA CADA HIJO DEL NODO
-    alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
+    desconocidasCompatibles(Nodo, [DescComp|[Resto|_]]),
+    abp(DescComp, ProfR, Alfa, Beta, 0, Peso2),
     Alfa is max(Alfa, Peso2),
     Alfa >= Beta,
     %poda(Beta)
@@ -50,12 +52,10 @@ abp(Nodo, Prof, Alfa, Beta, 0, Peso):-
     ProfR is Prof-1,
     mano(Mano),
     manoCompatible(Nodo, Mano, [Compat|Resto]),
-    % PARA CADA HIJO DEL NODO
-    alfabeta(Hijo, ProfR, Alfa, Beta, 0, Peso2),
+    abp(Compat, ProfR, Alfa, Beta, 1, Peso2),
     Beta is min(Beta, Peso2),
     Alfa >= Beta,
-    poda(Alfa),
-    % PARA CADA HIJO DEL NODO
+    %poda(Alfa),
     Peso is Beta.
 
 /**

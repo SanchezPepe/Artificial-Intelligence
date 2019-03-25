@@ -14,6 +14,8 @@ Funciones a implementar:
 :-dynamic noTiene/1. 
 :-dynamic tablero/1.    
 :-dynamic pozo/1.
+:-dynamic numeros/1.
+
 
 desconocidas([[0, 0],
             [1, 0],[1, 1],
@@ -221,7 +223,8 @@ decrementa(X):-
     % Obtiene de la lista
     nth0(X,Y,Z),
     % Quita de la lista
-    nth1(X,Y, _, W),
+    I is X+1,
+    nth1(I,Y, _, W),
     A is Z-1,
     % Inserta en la lsita
     nth0(X, B, A, W),
