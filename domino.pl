@@ -287,8 +287,12 @@ movimientosPosibles(T),!.
 
 /**
  * Métodos para alfabeta pruning
- * 
  * */
+
+/**
+ * Regla que decrementa el hecho que guarda cuántas fichas quedan de cada número para
+ * una lista específica 
+ * **/
 decrementaListaAux(Index, Lista, Ret):-
     % Obtiene de la lista
     nth0(Index,Lista,Cant),
@@ -299,7 +303,12 @@ decrementaListaAux(Index, Lista, Ret):-
     nth0(Index, Nva, Dec, W),
     append(Nva, [], Ret).
 
-%LLAMADA INICIAL = alfabeta(origen, profundidad, -inf, +inf, max) 
+/**
+ * Regla que implementa alfabeta pruning dado un estado del juego,
+ * recibe el Nodo raíz, la profundidad de la búsqueda y las cotas alfa
+ * y beta.
+ * Llamada inicial: alfabeta(raiz, profundidad, -inf, +inf, max) 
+ * */
 abp([H|T], 0, _, _, _, Value):-
     length(desconocidas, X),
     pozo(Y),
@@ -362,11 +371,18 @@ estimacion(Desconocidas, NumPozo, QuedanNum, Estimacion):-
 	(NumPozo = 0) -> Estimacion is 0;
 	(NumPozo \= 0) -> Estimacion is (1-(QuedanNum/Desconocidas)).
 
+% Reglas Auxiliares
+
 /**
- * Funciones Auxiliares
+ * Reglas que compara dos fichas para comprobar si se puede utilizar en el tiro.
  * */
 fichaCompatible(Tablero, [H|[T|_]]):-
     (member(H, Tablero) ; member(T, Tablero)).
+
+/**
+ * Regla que recibe el estado del tablero y un conjunto de fichas. Regresa una lista
+ * de fichas que se pueden tirar. Ya sea de la mano o de las desconocidas 
+ **/
 
 fichasCompatibles(_,[],[]).
 fichasCompatibles(Tablero, [H|T], X):-
