@@ -196,7 +196,10 @@ tiroOponente:-
     append(S, [ValDer], Z),
     retract(noTiene(N)),
     assert(noTiene(Z)),
+    pozo(0),
     tiro.
+tiroOponente:-
+    tiroOponente.
 
 /*
     Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
