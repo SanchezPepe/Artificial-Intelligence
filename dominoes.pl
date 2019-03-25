@@ -11,7 +11,17 @@ Funciones a implementar:
 **/
 
 :- ensure_loaded(fichas).
-numeros([7,7,7,7,7,7,7]).
+numeros([8,8,8,8,8,8,8]).
+:-dynamic numeros/1.
+:-dynamic desconocidas/1.
+
+desconocidas([[0, 0],
+            [1, 0],[1, 1],
+            [2, 0],[2, 1],[2, 2],
+            [3, 0],[3, 1],[3, 2],[3, 3],
+            [4, 0],[4, 1],[4, 2],[4, 3],[4, 4],
+            [5, 0],[5, 1],[5, 2],[5, 3],[5, 4],[5, 5],
+            [6, 0],[6, 1],[6, 2],[6, 3],[6, 4],[6, 5],[6, 6]]).
 
 /* 
     Para iniciar el juego se consulta "main.". Posteriormente, te pedirá las 7 fichas iniciales 
@@ -36,6 +46,8 @@ main:-
     retract(mano(X)),
     assert(mano(M)),
     actualizaPrim(Ficha),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
     tiroOponente.
 main:-
     primerTiroOponente.
@@ -44,10 +56,15 @@ main:-
     En caso de que empieze el oponente, esta regla recibe la ficha y llama otra regla que actualiza los
     extremos del tablero. 
 */
-primerTiroOponente:-
+primerTiroOponente:-    
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
     actualizaPrim(Ficha),tiro,!.
 
 
@@ -70,7 +87,10 @@ inicio():-
     append(X,[Ficha],Y),
     retract(mano(X)),
     assert(mano(Y)),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     Ficha==fin,!.
 
 list_not_empty([_]).
@@ -98,6 +118,8 @@ tiro:-
     retract(mano(X)),
     assert(mano(M)),
     actualizaExtremo([A|B],Z),
+    sacaCola2([A|B],C),
+    decrementa(A),decrementa(C),
     tiroOponente.
   
 tiro:-
@@ -119,7 +141,10 @@ roba:-
     append(X,[Ficha],Y),
     retract(mano(X)),
     assert(mano(Y)),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     pozo(P),
     A is P-1,
     retract(pozo(P)),
@@ -139,10 +164,16 @@ tiroOponente:-
     Resp==si,
     write("¿Qué ficha tiró el oponente?"),nl,
     read(Ficha),
-    retract(desconocidas(Ficha)),
+    desconocidas(DESC),
+    delete(DESC,Ficha,NUEVDESC),
+    retract(desconocidas(DESC)),
+    assert(desconocidas(NUEVDESC)),
     write("¿De qué lado del tablero tiró el oponente? d/i"),nl,
     read(Lado),
-    actualizaExtremo(Ficha, Lado),tiro.
+    actualizaExtremo(Ficha, Lado),
+    sacaCola(Ficha,A),sacaCola2(Ficha,B),
+    decrementa(A),decrementa(B),
+    tiro.
 tiroOponente:-    
     write("¿Cuántas fichas tomó del pozo? "),nl,
     read(Num),
@@ -156,7 +187,8 @@ tiroOponente:-
     append(N, [ValIzq], S),
     append(S, [ValDer], Z),
     retract(noTiene(N)),
-    assert(noTiene(Z)),tiro.
+    assert(noTiene(Z)),
+    tiro.
 
 /*
     Esta regla se llama una vez al inicio del juego y se encarga de actualizar los extremos del tablero.
@@ -176,6 +208,8 @@ actualizaExtremo(Ficha, Lado):-
     Esta regla te regresa la cola de una lista.
 */
 sacaCola([A|_],B):-
+    B is A.
+sacaCola2([_|A],B):-
     B is A.
 
 /*
@@ -203,7 +237,8 @@ decrementa(X):-
     % Obtiene de la lista
     nth0(X,Y,Z),
     % Quita de la lista
-    nth1(X,Y, _, W),
+    I is X+1,
+    nth1(I,Y, _, W),
     A is Z-1,
     % Inserta en la lsita
     nth0(X, B, A, W),
