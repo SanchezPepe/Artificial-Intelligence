@@ -215,10 +215,22 @@ sacaCola2([_|A],B):-
 /*
     Esta regla actualiza el extremo derecho del tablero.
 */
-actED([A|ColaA]):-
+
+actED([A|[ColaA]]):-
     extremoDerecho(ED),
-    (A==ED)->retractall(extremoDerecho(_)), sacaCola(ColaA,B),assert(extremoDerecho(B));
-    retractall(extremoDerecho(_)),assert(extremoDerecho(A)).
+    ED==A,
+    retractall(extremoDerecho(_)),
+    retractall(extremoDerecho(_)),
+    assert(extremoDerecho(ColaA)),!.
+actED([A|_]):-
+    retractall(extremoDerecho(_)),
+    retractall(extremoDerecho(_)),
+    assert(extremoDerecho(A)),!.
+
+test:-
+    actED([6,1]),
+    extremoDerecho(X),
+write(X).
 
 /*
     Esta regla actualiza el extremo izquierdo del tablero.
