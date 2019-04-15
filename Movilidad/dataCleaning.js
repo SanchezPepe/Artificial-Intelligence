@@ -8036,23 +8036,53 @@ var mb = [{
     "record_timestamp": "2018-11-12T17:49:59-06:00"
 }]
 
-
-/** 
 var tuple = "";
-var tuple2 = "";
+var line = 0;
+var lineas = ["", "", "", "", "", "", "", "", "", "", "", ""];
 mt.forEach(e => {
-    if (e.fields.stop_desc.includes("correspondencia")) {
-        tuple2 += "stop(" + e.fields.stop_name.replace(" ", "_") + "," + e.fields.stop_lat + "," + e.fields.stop_lon + "," + e.fields.stop_desc + ").\n";
-    } else {
-        tuple += "stop(" + e.fields.stop_name.replace(" ", "_") + "," + e.fields.stop_lat + "," + e.fields.stop_lon + "," + e.fields.stop_desc + ").\n";
+    if (e.fields.stop_desc.includes("correspondencia"))
+        line = e.fields.stop_desc.substring(12, 14);
+    else
+        line = e.fields.stop_desc.substring(6, 8);
+    switch (line) {
+        case "A":
+            line = 10;
+            break;
+        case "B":
+            line = 11;
+            break;
+        default:
+            line = parseInt(line);
     }
+    tuple = "metro(" + e.fields.stop_name.replace(" ", "_") + "," + e.fields.stop_lat + "," + e.fields.stop_lon + "," + line + ").\n";
+    lineas[line - 1] += tuple
 });
-console.log(tuple.toLowerCase() + tuple2.toLowerCase());
-*/
+i = 1;
+var final = "";
+lineas.forEach(e => {
+    final += "%% Línea " + i + "\n" + e;
+    i++;
+});
+final = final.toLowerCase();
+console.log(final);
 
+/**
 var tuple = "";
+var line = 3;
+var lineas = ["", "","","","",""];
 mb.forEach(e => {
-    var info = "stop(" + e.fields.nombre.replace(" ", "_") + "," + e.fields.geopoint[0] + "," + e.fields.geopoint[1] + "," + e.fields.linea + ").\n";
-    tuple += info;
+    line = parseInt(e.fields.linea.replace("Linea ", ""));
+    lineas[line-1] += "stop(" + e.fields.nombre.replace(" ", "_") + "," + e.fields.geopoint[0] + "," + e.fields.geopoint[1] + "," + e.fields.linea.replace("Linea ", "") + ").\n";
 });
-console.log(tuple.toLowerCase());
+i = 1;
+var final = "";
+lineas.forEach(e => {
+    final += "%% Línea " + i + "\n" + e;   
+    i++; 
+});
+final = final.toLowerCase();
+console.log(final);
+function clean(){
+    document.getElementById("txt").textContent = final;
+}
+**/
