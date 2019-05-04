@@ -1,3 +1,4 @@
+indios_verdes,19.496784,-99.119728,1
 el_caminero,19.279392,-99.169174,1
 teatro_de_los_insurgentes,19.365011,-99.181747,1
 ciudad_de_los_deportes,19.382601,-99.176041,1
@@ -32,7 +33,6 @@ bombilla,19.346811,-99.187912,1
 perisur,19.304468,-99.186066,1
 campeche,19.409693,-99.16732,1
 la_raza,19.468838,-99.138802,1
-indios_verdes,19.496784,-99.119728,1
 euzkaro,19.482473,-99.127739,1
 ciudad_universitaria,19.322798,-99.188431,1
 la_joya,19.280359,-99.170097,1
