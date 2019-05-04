@@ -1,6 +1,4 @@
 /**
- * metro(cuauhtemoc,19.42565962,-99.15455103,1).
- * 
  * Programar un mini-Router y realizar experimentos con él. 
  * Router es un sistema de inteligencia artificial que usa múltiples estrategias de razonamiento para planear rutas.
  * El mini-Router debe hacer lo mismo pero en un dominio diferente
@@ -20,8 +18,8 @@
  *      Elegir una función heurística adecuada (puede depender de la disponibilidad de datos adecuados) para la ejecución del algoritmo A*.
  *
  * FORMATO ESTACIONES:
- *      metro(estacion, lat, long, linea)
- *      metrobus(estacion, lat, long, linea)     
+ *      metro(estacion, lat, long, linea, orden)
+ *      metrobus(estacion, lat, long, linea, orden)     
  **/
 
 /**
