@@ -18,35 +18,59 @@
  *      Elegir una función heurística adecuada (puede depender de la disponibilidad de datos adecuados) para la ejecución del algoritmo A*.
  *
  * FORMATO ESTACIONES:
- *      metro(estacion, lat, long, linea, orden)
- *      metrobus(estacion, lat, long, linea, orden)     
+ *      station(sistema, estacion, lat, long, linea, orden)
  **/
 
 /**
  * Regla que permite calcular la norma euclidiana de dos estaciones, se proporcionan como parámetros las cordenadas
  * X,Y de cada estación (latitud y longitud).
  **/
-:- ensure_loaded(estaciones_metro).
-:- ensure_loaded(estaciones_metrobus).
+:- ensure_loaded(estaciones).
 :-dynamic path/1.
 
 path([]).
 
 norma(Est1,Est2,Dist):-
-    metro(Est1,Cord1,Cord2,_,_),
-    metro(Est2,C1,C2,_,_),
+    station(_,Est1,Cord1,Cord2,_,_),
+    station(_,Est2,C1,C2,_,_),
     normaEuclidiana(Cord1,Cord2,C1,C2,Dist),!.
-norma(Est1,Est2,Dist):-
-    mb(Est1,Cord1,Cord2,_,_),
-    mb(Est2,C1,C2,_,_),
-    normaEuclidiana(Cord1,Cord2,C1,C2,Dist),!.
-
 
 normaEuclidiana(X1, Y1, X2, Y2, N):-
     X is (X2-X1),
     Y is (Y2-Y1), 
     SUM is (X*X) + (Y*Y),
     N is 100*sqrt(SUM).
+
+numStations(System, Line, Count):-
+    aggregate_all(count, station(System,_,_,_,Line,_), Count).
+
+adyacentStations(System, Station, Line, Stations):-
+    station(System, Station, _, _, Line, Index),
+    L is Index-1,
+    R is Index+1,
+    station(System,Left,_,_,Line, L),
+    station(System,Right,_,_,Line, R),
+    Stations = [Left, Right], !.
+adyacentStations(System, Station, Line, Stations):-
+    station(System, Station, _, _, Line, Index),
+    R is Index+1,
+    station(System,Right,_,_,Line, R),
+    Stations = [[], Right], !.
+adyacentStations(System, Station, Line, Stations):-
+    station(System, Station, _, _, Line, Index),
+    L is Index-1,
+    station(System,Left,_,_,Line, L),
+    Stations = [Left,[]], !.
+
+
+
+obtenHijos(Estacion, Destino):-
+    station(System,Estacion, X1, Y1, _, Index),
+    Index > 0,
+    Izq is Index-1,
+    station(System,Destino, X2, Y2, _, _),
+    normaEuclidiana(X1, Y1, X2, Y2, Distancia).
+
 
 /**
  * Funciones auxiliares 
@@ -67,12 +91,9 @@ a_star(Node, Goal,X,Peso):-
     X is Der,
     Peso is Res2.
 
-
 /**
- * Se da el punto incio y el de llegada, se regresa
- * una lista con las instrucciones
+ * Algoritmo A*
+ * Regresa lista de estaciones en el camino
  **/
-a_star(Start, Weight, Goal, Res):-
-    Start is Goal, !.
-a_star(Start, Weight, Goal, Res):-!.
-
+a_star([Start|Peso], Goal, Open, Closed, Path):-
+    normaEuclidiana(Start, Goal, F).  %En este caso f(n) = h(n) ya que g(n) = 0
