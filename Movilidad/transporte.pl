@@ -35,18 +35,18 @@ path([]).
 norma(Est1,Est2,Dist):-
     metro(Est1,Cord1,Cord2,_,_),
     metro(Est2,C1,C2,_,_),
-    normaEuclidiana(Cord1,Cord2,C1,C2,Dist).
+    normaEuclidiana(Cord1,Cord2,C1,C2,Dist),!.
 norma(Est1,Est2,Dist):-
     mb(Est1,Cord1,Cord2,_,_),
     mb(Est2,C1,C2,_,_),
-    normaEuclidiana(Cord1,Cord2,C1,C2,Dist).
+    normaEuclidiana(Cord1,Cord2,C1,C2,Dist),!.
 
 
 normaEuclidiana(X1, Y1, X2, Y2, N):-
     X is (X2-X1),
     Y is (Y2-Y1), 
     SUM is (X*X) + (Y*Y),
-    N is sqrt(SUM).
+    N is 100*sqrt(SUM).
 
 /**
  * Funciones auxiliares 
@@ -58,7 +58,7 @@ a_star(Node, Goal,X,Peso):-
     metro(Goal, NX,NY, Line, IndexG),
     metro(Node, GX,GY, Line, Index),
     I is Index-1,
-    D is Index+1
+    D is Index+1,
     metro(Izq,X1,Y1,Line, I),
     metro(Der,X2,Y2,Line, D),
     normaEuclidiana(X1, Y1, NX, NY, Res),
@@ -66,7 +66,6 @@ a_star(Node, Goal,X,Peso):-
     Res > Res2, % Es la estación derecha
     X is Der,
     Peso is Res2.
-a_star():-
 
 
 /**
@@ -75,5 +74,5 @@ a_star():-
  **/
 a_star(Start, Weight, Goal, Res):-
     Start is Goal, !.
-a_star(Start, Weight, Goal, Res):-
+a_star(Start, Weight, Goal, Res):-!.
 
