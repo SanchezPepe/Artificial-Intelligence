@@ -30,19 +30,60 @@ adyacentStations(System, Station, Line, Stations):-
     L is Index-1,
     R is Index+1,
     numStations(System, Line, Count),
-    (L > 0 -> station(System,Left,_,_,Line, L) ; Left is 0),
-    (R =< Count -> station(System,Right,_,_,Line, R) ; Right is 0),
-    Stations = [Left, Right], !.
+    (L > 0, R =< Count -> station(System,Left,_,_,Line, L), station(System,Right,_,_,Line, R), Stations = [Left, Right] 
+    ; (L =:= 0 -> station(System,Right,_,_,Line, R), Stations = [Right] ; station(System,Left,_,_,Line, L), Stations = [Left])), !.
 
-% Regresa 1 si es a la derecha, 0 a la izq
-checkDirection([H|[T]], Goal, Direction):-
+% Regresa 1 si es a la derecha/abajo, -1 a la izq/arriba
+checkDirection([H|[T]],Goal,_, Direction):-
     norma(H,Goal, Left),
     norma(T,Goal, Right),
-    (Left < Right -> Direction is 0 ; Direction is 1).
+    (Left < Right -> Direction is -1 ; Direction is 1).
+checkDirection([H|[]],_,Line, Dir):- % Si es terminal o inicio de línea
+    station(_,H,_,_,Line,Order),
+    (Order =:= 1 -> Dir is 1 ; Dir is -1).
 
 checkConnections(Station, Conections):-
-    findall([Line, System] ,station(System,Station,_,_,Line,_),Conections).
+    findall([Station, Line, System] ,station(System,Station,_,_,Line,_),Conections).
 
+getChildNodes(Sys, Node, Line, Goal, Childs):-
+    station(Sys, Node, _,_,Line,Ind),
+    adyacentStations(Sys, Node, Line, Ad),
+    checkDirection(Ad, Goal, Line, Dir),
+    Ind is Ind + Dir,
+    station(Sys, Child, _,_,Line,Ind),  % Estación adyacente al nodo más cerana al Goal
+    checkConnections(Node, Conections), % Estaciones de transbordo
+    ChildInSameLine = [Child, Line, Sys],
+    append(Conections, ChildInSameLine, Childs).
+    
 test:-
-    adyacentStations(metro, pantitlan,9, D),
+    getChildNodes(metro,el_rosario,7, zapata, D),
     write(D).
+
+priority-queue :-
+    TL0 = [3-'Clear drains',
+           4-'Feed cat'],
+   
+    % we can create a priority queue from a list
+    list_to_heap(TL0, Heap0),
+   
+    % alternatively we can start from an empty queue
+    % get from empty_heap/1.
+   
+    % now we add the other elements
+    add_to_heap(Heap0, 5, 'Make tea', Heap1),
+    add_to_heap(Heap1, 1, 'Solve RC tasks', Heap2),
+    add_to_heap(Heap2, 2, 'Tax return', Heap3),
+   
+    % we list the content of the heap:
+    heap_to_list(Heap3, TL1),
+    writeln('Content of the queue'), maplist(writeln, TL1),
+    nl,
+   
+    % now we retrieve the minimum-priority pair
+    get_from_heap(Heap3, Priority, Key, Heap4),
+    format('Retrieve top of the queue : Priority ~w, Element ~w~n', [Priority, Key]),
+    nl,
+   
+    % we list the content of the heap:
+    heap_to_list(Heap4, TL2),
+    writeln('Content of the queue'), maplist(writeln, TL2).
