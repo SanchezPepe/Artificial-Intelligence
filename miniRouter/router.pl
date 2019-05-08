@@ -45,7 +45,7 @@ checkDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
     (Dif > 0 -> Dir is -1 ; Dir is 1).
 
 checkConnections(Station, Conections):-
-    findall([Station, Line, System] ,station(System,Station,_,_,Line,_),Conections).
+    findall([System, Station, Line] ,station(System,Station,_,_,Line,_),Conections).
 
 getChildNodes(Sys, Node, Line, Goal, Childs):-
     station(Sys, Node, _,_,Line,Ind),
@@ -54,38 +54,41 @@ getChildNodes(Sys, Node, Line, Goal, Childs):-
     I is Ind + Dir,
     station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
     checkConnections(Node, Conections), % Estaciones de transbordo
-    ChildInSameLine = [Child, Line, Sys],
-    append(Conections, [ChildInSameLine], Childs), !.
-    
-test:-
-    getChildNodes(metro,el_rosario,7, zapata, D),
-    write(D).
+    delete(Conections, [Sys, Node, Line], Con),
+    ChildInSameLine = [Sys, Child, Line],
+    append(Con, [ChildInSameLine], Childs), !.
 
-priority-queue :-
-    TL0 = [3-'Clear drains',
-           4-'Feed cat'],
-   
-    % we can create a priority queue from a list
-    list_to_heap(TL0, Heap0),
-   
-    % alternatively we can start from an empty queue
-    % get from empty_heap/1.
-   
-    % now we add the other elements
-    add_to_heap(Heap0, 5, 'Make tea', Heap1),
-    add_to_heap(Heap1, 1, 'Solve RC tasks', Heap2),
-    add_to_heap(Heap2, 2, 'Tax return', Heap3),
-   
-    % we list the content of the heap:
-    heap_to_list(Heap3, TL1),
-    writeln('Content of the queue'), maplist(writeln, TL1),
-    nl,
-   
-    % now we retrieve the minimum-priority pair
-    get_from_heap(Heap3, Priority, Key, Heap4),
-    format('Retrieve top of the queue : Priority ~w, Element ~w~n', [Priority, Key]),
-    nl,
-   
-    % we list the content of the heap:
-    heap_to_list(Heap4, TL2),
-    writeln('Content of the queue'), maplist(writeln, TL2).
+nodeValue([Sys|[Node|[Line]]], Goal, Prev, List):-
+    norma(Node, Goal, H),   % Valor heurístico
+    norma(Node, Prev, G),   % Peso del nodo previo al actual
+    F is G + H,
+    List = [F,Sys, Node, Line].
+
+getHead([H|_], Head):-
+    Head = H.
+
+getTail([_|T], Tail):-
+    Tail is T.
+
+% Añadir a cola de prioridades.
+addToPriorityQueue(Elem, [], First):-
+    First = [Elem], !.
+addToPriorityQueue(Node, [Queue|Tail], Ans):-
+    getHead(Node, Priority), % Prioridad del nodo a insertar
+    getHead(Queue, HeadPriority),    % Prioridad del primer elemento de la cola
+    Priority > HeadPriority,
+    addToPriorityQueue(Node, Tail, Rest),
+    append([Queue], Rest, Ans), !.
+addToPriorityQueue(Node, Queue, Ans):-
+    append([Node], Queue, Ans), !.
+
+
+test:-
+    %getChildNodes(metro,mixcoac,7, zapata, D),
+    Queue = [],
+    %writeln(Val),
+    addToPriorityQueue([14,metro,auditorio,7], Queue, Res),
+    %writeln(Val1),
+    addToPriorityQueue([7,metro,auditorio,7], Res, Res2),    
+    %writeln(Val2),
+    addToPriorityQueue([1,metro,auditorio,7], Res2, Res3), writeln(Res3).
