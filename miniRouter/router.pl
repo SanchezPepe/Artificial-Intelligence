@@ -8,8 +8,8 @@ path([]).
  **/
 
 /**
- * Regla que permite calcular la norma euclidiana de dos estaciones, se proporcionan como parámetros las cordenadas
- * X,Y de cada estación (latitud y longitud).
+ * Regla que permite calcular la norma euclidiana de dos estaciones, se 
+ * proporcionan como parámetros las cordenadas X,Y de cada estación (latitud y longitud).
  **/
 normaEuclidiana(X1, Y1, X2, Y2, N):-
     X is (X2-X1),
@@ -29,19 +29,10 @@ adyacentStations(System, Station, Line, Stations):-
     station(System, Station, _, _, Line, Index),
     L is Index-1,
     R is Index+1,
-    station(System,Left,_,_,Line, L),
-    station(System,Right,_,_,Line, R),
+    numStations(System, Line, Count),
+    (L > 0 -> station(System,Left,_,_,Line, L) ; Left is 0),
+    (R =< Count -> station(System,Right,_,_,Line, R) ; Right is 0),
     Stations = [Left, Right], !.
-adyacentStations(System, Station, Line, Stations):-
-    station(System, Station, _, _, Line, Index),
-    R is Index+1,
-    station(System,Right,_,_,Line, R),
-    Stations = [[], Right], !.
-adyacentStations(System, Station, Line, Stations):-
-    station(System, Station, _, _, Line, Index),
-    L is Index-1,
-    station(System,Left,_,_,Line, L),
-    Stations = [Left,[]], !.
 
 % Regresa 1 si es a la derecha, 0 a la izq
 checkDirection([H|[T]], Goal, Direction):-
@@ -49,10 +40,9 @@ checkDirection([H|[T]], Goal, Direction):-
     norma(T,Goal, Right),
     (Left < Right -> Direction is 0 ; Direction is 1).
 
-
 checkConnections(Station, Conections):-
     findall([Line, System] ,station(System,Station,_,_,Line,_),Conections).
 
 test:-
-    checkConnections(tacubaya, D),
+    adyacentStations(metro, pantitlan,9, D),
     write(D).
