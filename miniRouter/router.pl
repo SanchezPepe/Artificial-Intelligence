@@ -30,6 +30,9 @@
 
 path([]).
 
+/**
+ * Funciones auxiliares 
+ **/
 norma(Est1,Est2,Dist):-
     station(_,Est1,Cord1,Cord2,_,_),
     station(_,Est2,C1,C2,_,_),
@@ -62,38 +65,16 @@ adyacentStations(System, Station, Line, Stations):-
     station(System,Left,_,_,Line, L),
     Stations = [Left,[]], !.
 
+% Regresa 1 si es a la derecha, 0 a la izq
+checkDirection([H|[T]], Goal, Direction):-
+    norma(H,Goal, Left),
+    norma(T,Goal, Right),
+    (Left < Right -> Direction is 0 ; Direction is 1).
 
 
-obtenHijos(Estacion, Destino):-
-    station(System,Estacion, X1, Y1, _, Index),
-    Index > 0,
-    Izq is Index-1,
-    station(System,Destino, X2, Y2, _, _),
-    normaEuclidiana(X1, Y1, X2, Y2, Distancia).
+checkConnections(Station, Conections):-
+    findall([Line, System] ,station(System,Station,_,_,Line,_),Conections).
 
-
-/**
- * Funciones auxiliares 
- *      Fn que regrese estación (es) cercanas con el peso.
- *      Modificar norma para que funcione con los nombres.
- *
- **/
-a_star(Node, Goal,X,Peso):-
-    metro(Goal, NX,NY, Line, IndexG),
-    metro(Node, GX,GY, Line, Index),
-    I is Index-1,
-    D is Index+1,
-    metro(Izq,X1,Y1,Line, I),
-    metro(Der,X2,Y2,Line, D),
-    normaEuclidiana(X1, Y1, NX, NY, Res),
-    normaEuclidiana(X2, Y2, NX, NY, Res2),
-    Res > Res2, % Es la estación derecha
-    X is Der,
-    Peso is Res2.
-
-/**
- * Algoritmo A*
- * Regresa lista de estaciones en el camino
- **/
-a_star([Start|Peso], Goal, Open, Closed, Path):-
-    normaEuclidiana(Start, Goal, F).  %En este caso f(n) = h(n) ya que g(n) = 0
+test:-
+    checkConnections(tacubaya, D),
+    write(D).

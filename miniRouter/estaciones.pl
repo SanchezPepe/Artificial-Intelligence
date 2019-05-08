@@ -223,7 +223,7 @@ station(mb,revolucion,19.440411,-99.15554,1,11).
 station(mb,plaza_de_la_republica,19.436152,-99.157227,1,12).
 station(mb,reforma,19.433065,-99.158806,1,13).
 station(mb,hamburgo,19.427805,-99.161057,1,14).
-station(mb,glorieta_insurgentes,19.424107,-99.163254,1,15).
+station(mb,insurgentes,19.424107,-99.163254,1,15).
 station(mb,durango,19.419903,-99.16404,1,16).
 station(mb,alvaro_obregon,19.416866,-99.164856,1,17).
 station(mb,sonora,19.413143,-99.166245,1,18).
@@ -336,7 +336,7 @@ station(mb,puente_de_alvarado,19.438641,-99.153458,4,3).
 station(mb,plaza_de_la_republica,19.436804,-99.154137,4,4).
 station(mb,glorieta_de_colon,19.434158,-99.153534,4,5).
 station(mb,expo_reforma,19.433105,-99.150627,4,6).
-station(mb,vocacional_5,19.431589,-99.150215,7).
+station(mb,vocacional_5,19.431589,-99.150215,4,7).
 station(mb,juarez,19.431259,-99.147743,4,8).
 station(mb,plaza_san_juan,19.430607,-99.143547,4,9).
 station(mb,eje_central,19.430304,-99.1408,4,10).
