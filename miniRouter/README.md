@@ -28,4 +28,4 @@ Ejemplos:
         station(mb,indios_verdes,19.496784,-99.119728,1,1).
 
 ## Mapa de la red de metro y metrobus
-![mapaMetroMetrobus](/assets/map.jpg)
+![mapaMetroMetrobus](assets/map.jpg)
