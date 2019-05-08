@@ -34,13 +34,15 @@ adyacentStations(System, Station, Line, Stations):-
     ; (L =:= 0 -> station(System,Right,_,_,Line, R), Stations = [Right] ; station(System,Left,_,_,Line, L), Stations = [Left])), !.
 
 % Regresa 1 si es a la derecha/abajo, -1 a la izq/arriba
-checkDirection([H|[T]],Goal,_, Direction):-
+checkDirection([H|[T]],_,Goal,_, Direction):-
     norma(H,Goal, Left),
     norma(T,Goal, Right),
     (Left < Right -> Direction is -1 ; Direction is 1).
-checkDirection([H|[]],_,Line, Dir):- % Si es terminal o inicio de línea
+checkDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
+    station(_,Start,_,_,Line,StartOrder),    
     station(_,H,_,_,Line,Order),
-    (Order =:= 1 -> Dir is 1 ; Dir is -1).
+    Dif is StartOrder-Order,
+    (Dif > 0 -> Dir is -1 ; Dir is 1).
 
 checkConnections(Station, Conections):-
     findall([Station, Line, System] ,station(System,Station,_,_,Line,_),Conections).
@@ -48,12 +50,12 @@ checkConnections(Station, Conections):-
 getChildNodes(Sys, Node, Line, Goal, Childs):-
     station(Sys, Node, _,_,Line,Ind),
     adyacentStations(Sys, Node, Line, Ad),
-    checkDirection(Ad, Goal, Line, Dir),
-    Ind is Ind + Dir,
-    station(Sys, Child, _,_,Line,Ind),  % Estación adyacente al nodo más cerana al Goal
+    checkDirection(Ad, Node, Goal, Line, Dir),
+    I is Ind + Dir,
+    station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
     checkConnections(Node, Conections), % Estaciones de transbordo
     ChildInSameLine = [Child, Line, Sys],
-    append(Conections, ChildInSameLine, Childs).
+    append(Conections, [ChildInSameLine], Childs), !.
     
 test:-
     getChildNodes(metro,el_rosario,7, zapata, D),
