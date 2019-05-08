@@ -1,4 +1,4 @@
-:- ensure_loaded(estaciones).
+:-ensure_loaded(estaciones).
 :-dynamic path/1.
 
 path([]).
@@ -82,6 +82,9 @@ addToPriorityQueue(Node, [Queue|Tail], Ans):-
 addToPriorityQueue(Node, Queue, Ans):-
     append([Node], Queue, Ans), !.
 
+popPriorityQueue([Queue|T], Rest, Elem):-
+    Rest = T, 
+    Elem = Queue.
 
 test:-
     %getChildNodes(metro,mixcoac,7, zapata, D),
@@ -91,4 +94,12 @@ test:-
     %writeln(Val1),
     addToPriorityQueue([7,metro,auditorio,7], Res, Res2),    
     %writeln(Val2),
-    addToPriorityQueue([1,metro,auditorio,7], Res2, Res3), writeln(Res3).
+    addToPriorityQueue([1,metro,auditorio,7], Res2, Res3), writeln(Res3),
+    % Pop
+    popPriorityQueue(Res3, X, Y),
+    writeln("Se quitó: "), writeln(Y),
+    writeln("Quedó "), writeln(X),
+
+    getChildNodes(metro, pantitlan, 9, mixcoac, C),
+    writeln(C).
+    
