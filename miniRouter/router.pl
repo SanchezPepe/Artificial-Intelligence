@@ -177,14 +177,15 @@ test:-
 
 
 
-% escribe_a_archivo(i).
-% Escribe en la base de
-% casos una lista dada.
-%
-% i: Lista
-escribe_a_archivo(L) :-
-    open('casos.txt', append, Stream),
-    ( write(Stream, L), write(Stream,"."), nl(Stream), !; true ),
+/**
+   newCase Agrega un nuevo caso a la memoria de datos.
+    La memoria de datos se guarda en un .txt llamado caseFile.txt
+    Debe estar en la carpeta del proyecto.
+    El predicado recibe un parámetro de entrada que es una lista.
+ **/
+newCase(List) :-
+    open('caseFile.txt', append, Stream),
+    ( write(Stream, List), write(Stream,"."), nl(Stream), !; true ),
     close(Stream).
 
 % lee_casos(o).
@@ -277,11 +278,14 @@ limpia_caso(Estacion1,Estacion2,Caso,Res):-
 % i: Estación 2
 % i: Ruta que contenga ambas estaciones
 % o: Ruta que empiece en una estación y termine en la otra
-encuentra_inicial(_,_,[],[]):-!.
-encuentra_inicial(Est1,_,[Est1|Resto],[Est1|Resto]):-!.
-encuentra_inicial(_,Est2,[Est2|Resto],[Est2|Resto]):-!.
+encuentra_inicial(_,_,[],[]):-
+    !.
+encuentra_inicial(Est1,_,[Est1|Resto],[Est1|Resto]):-
+    !.
+encuentra_inicial(_,Est2,[Est2|Resto],[Est2|Resto]):-
+    !.
 encuentra_inicial(Est1,Est2,[_|Resto],Res):-
-       encuentra_inicial(Est1,Est2,Resto,Res).
+    encuentra_inicial(Est1,Est2,Resto,Res).
 
 % imprime(i).
 % Imprime, línea a línea, el contenido
