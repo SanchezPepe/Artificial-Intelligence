@@ -38,6 +38,18 @@ round(X,D,Ans):-
     round(Z, ZA), 
     Ans is ZA / 10^D.
 
+getG(Node, Ans):-
+    getHead(Node, Values),
+    getHead(Values, Ans).
+
+getH(Node, Ans):-
+    getHead(Node, Head),
+    reverse(Head, R),
+    getHead(R, Ans).
+
+getName([_,_,Station, _], Name):-
+    Name = Station.
+
 % Añadir a cola de prioridades.
 addToPriorityQueue(Elem, _, [], First):-
     First = [Elem], !.
@@ -92,27 +104,38 @@ getChildNodes([_, Sys, Node, Line], Goal, Childs):-
     ChildInSameLine = [Sys, Child, Line],
     append(Con, [ChildInSameLine], Childs), !.
 
-nodeValue([Sys|[Node|[Line]]], Goal, Prev, List):-
-    (norma(Node, Prev, G) -> G is G ; G is 0),   % Peso del nodo previo al actual
+nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
+    (norma(Node, Prev, G) -> SumG is G + PrevG ; SumG is PrevG),   % Peso del nodo previo al actual
     norma(Node, Goal, H),   % Valor heurístico
-    List = [[G,H],Sys, Node, Line].
+    List = [[SumG,H],Sys, Node, Line].
 
 weightNodes([], _, _, _).
-weightNodes(Nodes, Goal, Pivot, Weighted):-
+weightNodes(Nodes, Goal, Prev, Weighted):-
     getTail(Nodes, Tail),
-    weightNodes(Tail, Goal, Pivot, W),
+    weightNodes(Tail, Goal, Prev, W),
     getHead(Nodes, Head),
-    nodeValue(Head, Goal, Pivot, NodeVal),
+    getG(Prev, PrevG),
+    getName(Prev, PrevName),
+    nodeValue(Head, Goal, PrevName, PrevG, NodeVal),
     getHead(NodeVal, Weights),
     getHead(Weights, G),   
     getLast(Weights, H),
     F is G + H,
     addToPriorityQueue(NodeVal, F, W, Weighted), !.
 
-evaluateChildNodes(Parent, Childs, Ans):-
-    !.
+% SuccessorCurrentCost = g(n) + dist(actual a sucesor)
+evaluateCurrentAndSuccessor(Current, Succesor, Ans):-
+    getG(Current, G),
+    getG(Succesor, W),
+    Ans = G + W.
 
+/**
+evaluateChildNodes(Parent, Childs, Open, Closed):-
+    getHead(Childs, Head),
+    evaluateCurrentAndSuccessor(Parent, Head, Ev),
 
+**/
+/**
 
 a_star(Start, Goal, [], Path):- % Caso en el que llegó a la estación destino.
     (Start =:= Goal -> Path = [Goal] ; false).
@@ -120,11 +143,18 @@ a_star(Start, Goal, Open, Path):- % Se llama con la estación Start en la lista 
     getHead(Open, First),
     getChildNodes(First, Goal, Childs), % Expandir nodos
     weightNodes(Childs, Goal, Start, Weighted).
-
+**/
     
 
 
 test:-
+    getH([[3.3,7.93],metro,mixcoac,12], Ans),
+    writeln(Ans),
+    getChildNodes([_,metro, mixcoac, 7], zocalo, C),
+    Last = [[4.5,7.93],metro,mixcoac,12],
+    weightNodes(C, zocalo, Last, W),
+    write("Cola de prioridades con pesos: "),
+    writeln(W).
     /**
     %getChildNodes(metro,mixcoac,7, zapata, D),
     Queue = [],
@@ -143,10 +173,6 @@ test:-
     writeln(List),
 
     **/
-    getChildNodes([_,metro, pantitlan, 9], mixcoac, C),
-    weightNodes(C, zocalo, puebla, W),
-    write("Cola de prioridades con pesos: "),
-    writeln(W).
 
     /**
      * 
