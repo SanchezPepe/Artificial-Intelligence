@@ -93,22 +93,6 @@ checkDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
 checkConnections(Station, Conections):-
     findall([System, Station, Line] ,station(System,Station,_,_,Line,_),Conections).
 
-getChildNodes([_, Sys, Node, Line], Goal, Childs):-
-    station(Sys, Node, _,_,Line,Ind),
-    adyacentStations(Sys, Node, Line, Ad),
-    checkDirection(Ad, Node, Goal, Line, Dir),
-    I is Ind + Dir,
-    station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
-    checkConnections(Node, Conections), % Estaciones de transbordo
-    delete(Conections, [Sys, Node, Line], Con),
-    ChildInSameLine = [Sys, Child, Line],
-    append(Con, [ChildInSameLine], Childs), !.
-
-nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
-    (norma(Node, Prev, G) -> SumG is G + PrevG ; SumG is PrevG),   % Peso del nodo previo al actual
-    norma(Node, Goal, H),   % Valor heurístico
-    List = [[SumG,H],Sys, Node, Line].
-
 weightNodes([], _, _, _).
 weightNodes(Nodes, Goal, Prev, Weighted):-
     getTail(Nodes, Tail),
@@ -123,17 +107,34 @@ weightNodes(Nodes, Goal, Prev, Weighted):-
     F is G + H,
     addToPriorityQueue(NodeVal, F, W, Weighted), !.
 
+getChildNodes([W, Sys, Node, Line], Goal, WeightedChilds):-
+    station(Sys, Node, _,_,Line,Ind),
+    adyacentStations(Sys, Node, Line, Ad),
+    checkDirection(Ad, Node, Goal, Line, Dir),
+    I is Ind + Dir,
+    station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
+    checkConnections(Node, Conections), % Estaciones de transbordo
+    delete(Conections, [Sys, Node, Line], Con),
+    ChildInSameLine = [Sys, Child, Line],
+    append(Con, [ChildInSameLine], Childs), 
+    weightNodes(Childs, Goal, [W, Sys, Node, Line] , WeightedChilds), !.
+
+nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
+    (norma(Node, Prev, G) -> SumG is G + PrevG ; SumG is PrevG),   % Peso del nodo previo al actual
+    norma(Node, Goal, H),   % Valor heurístico
+    List = [[SumG,H],Sys, Node, Line].
+
+
 % SuccessorCurrentCost = g(n) + dist(actual a sucesor)
 evaluateCurrentAndSuccessor(Current, Succesor, Ans):-
     getG(Current, G),
     getG(Succesor, W),
     Ans = G + W.
-
 /**
 evaluateChildNodes(Parent, Childs, Open, Closed):-
     getHead(Childs, Head),
     evaluateCurrentAndSuccessor(Parent, Head, Ev),
-
+    getChildNodes(P)
 **/
 /**
 
@@ -144,17 +145,15 @@ a_star(Start, Goal, Open, Path):- % Se llama con la estación Start en la lista 
     getChildNodes(First, Goal, Childs), % Expandir nodos
     weightNodes(Childs, Goal, Start, Weighted).
 **/
-    
 
 
 test:-
     getH([[3.3,7.93],metro,mixcoac,12], Ans),
     writeln(Ans),
-    getChildNodes([_,metro, mixcoac, 7], zocalo, C),
-    Last = [[4.5,7.93],metro,mixcoac,12],
-    weightNodes(C, zocalo, Last, W),
+    Last = [[0.2,7.93],metro,mixcoac,7],
+    getChildNodes(Last, zocalo, C),
     write("Cola de prioridades con pesos: "),
-    writeln(W).
+    writeln(C).
     /**
     %getChildNodes(metro,mixcoac,7, zapata, D),
     Queue = [],
