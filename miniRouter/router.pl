@@ -78,18 +78,36 @@ adyacentStations(System, Station, Line, Stations):-
     ; (L =:= 0 -> station(System,Right,_,_,Line, R), Stations = [Right] ; station(System,Left,_,_,Line, L), Stations = [Left])), !.
 
 % Regresa 1 si es a la derecha/abajo, -1 a la izq/arriba
-checkDirection([H|[T]],_,Goal,_, Direction):-
+getDirection([H|[T]],_,Goal,_, Direction):-
     norma(H,Goal, Left),
     norma(T,Goal, Right),
     (Left < Right -> Direction is -1 ; Direction is 1).
-checkDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
+getDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
     station(_,Start,_,_,Line,StartOrder),    
     station(_,H,_,_,Line,Order),
     Dif is StartOrder-Order,
     (Dif > 0 -> Dir is -1 ; Dir is 1).
 
-checkConnections(Station, Conections):-
+getSameStations(Station, Conections):-
     findall([System, Station, Line] ,station(System,Station,_,_,Line,_),Conections).
+
+getConnections(Sys, Node, Line, Connection):-
+    getSameStations(Node, Con),
+    delete(Con, [Sys,Node,Line], Connection).
+
+getAdyacentStationsCon([], _, Ans):-
+    Ans = [].
+getAdyacentStationsCon(Conections, Goal, Ans):-
+    getHead(Conections, [Sys, Name, Line]),
+    adyacentStations(Sys, Name, Line, Ad),
+    getDirection(Ad, Name, Goal, Line, Direction),
+    station(Sys, Name, _, _, Line, Order),
+    Index is Order + Direction,
+    station(Sys, Next, _, _, Line, Index),
+    getTail(Conections, Rest),
+    getAdyacentStationsCon(Rest, Goal, Con),
+    append([[Sys, Next, Line]], Con, Ans), !.
+    
 
 weightNodes([], _, _, _).
 weightNodes(Nodes, Goal, Prev, Weighted):-
@@ -108,13 +126,13 @@ weightNodes(Nodes, Goal, Prev, Weighted):-
 getChildNodes([W, Sys, Node, Line], Goal, WeightedChilds):-
     station(Sys, Node, _,_,Line,Ind),
     adyacentStations(Sys, Node, Line, Ad),
-    checkDirection(Ad, Node, Goal, Line, Dir),
+    getDirection(Ad, Node, Goal, Line, Dir),
     I is Ind + Dir,
     station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
-    checkConnections(Node, Conections), % Estaciones de transbordo
-    delete(Conections, [Sys, Node, Line], Con),
+    getConnections(Sys, Node, Line, Connections), % Estaciones de transbordo
+    getAdyacentStationsCon(Conections, Goal, AdCon),
     ChildInSameLine = [Sys, Child, Line],
-    append(Con, [ChildInSameLine], Childs), 
+    append(AdCon, [ChildInSameLine], Childs), 
     weightNodes(Childs, Goal, [W, Sys, Node, Line] , WeightedChilds), !.
 
 nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
@@ -142,13 +160,16 @@ a_star(_, Goal, Path):-
     Path = [Goal]. % Si se llegó al destino, Start = Goal
 
 test:-
-    Goal = polanco,
-    norma(constituyentes, Goal, InitialH),
-    Start = [[0,InitialH], metro, constituyentes, 7],
-    a_star(Start,Goal,Path),
+    Goal = el_caminero,
+    Start = olivo,
+    station(Sys, Start, _,_,Line,_),
+    a_star([[0,0], Sys, Start, Line],Goal,Path),
     write(Path).
-    
     /**
+    getConnections(metro, tacubaya, 9, Con),
+    getAdyacentStationsCon(Con, mixcoac, C),
+    write(C).
+
     getH([[3.3,7.93],metro,mixcoac,12], Ans),
     writeln(Ans),
     %getChildNodes(metro,mixcoac,7, zapata, D),
