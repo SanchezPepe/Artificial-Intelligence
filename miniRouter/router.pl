@@ -1,8 +1,6 @@
 :-ensure_loaded(estaciones).
 :-dynamic path/1.
 
-path([]).
-
 /**
  * Funciones auxiliares 
  **/
@@ -124,37 +122,35 @@ nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
     norma(Node, Goal, H),   % Valor heurístico
     List = [[SumG,H],Sys, Node, Line].
 
-
 % SuccessorCurrentCost = g(n) + dist(actual a sucesor)
 evaluateCurrentAndSuccessor(Current, Succesor, Ans):-
     getG(Current, G),
     getG(Succesor, W),
     Ans = G + W.
-/**
-evaluateChildNodes(Parent, Childs, Open, Closed):-
-    getHead(Childs, Head),
-    evaluateCurrentAndSuccessor(Parent, Head, Ev),
-    getChildNodes(P)
-**/
-/**
 
-a_star(Start, Goal, [], Path):- % Caso en el que llegó a la estación destino.
-    (Start =:= Goal -> Path = [Goal] ; false).
-a_star(Start, Goal, Open, Path):- % Se llama con la estación Start en la lista open
-    getHead(Open, First),
-    getChildNodes(First, Goal, Childs), % Expandir nodos
-    weightNodes(Childs, Goal, Start, Weighted).
-**/
-
+/**
+ * Inicia con la estación Start con el formato [[g(n)=0, h(n)], Sys, Station, Line].
+ * **/
+a_star(Parent, Goal, Path):-
+    getName(Parent, PName),
+    PName \= Goal,
+    getChildNodes(Parent, Goal, Childs), % Obtiene los nodos hijos para la estación actual
+    getHead(Childs, Succesor), % Obtiene el primer hijo ordenado (f(n) más chico)
+    a_star(Succesor, Goal, Closed),
+    append([PName], Closed, Path), !.
+a_star(_, Goal, Path):-
+    Path = [Goal]. % Si se llegó al destino, Start = Goal
 
 test:-
+    Goal = polanco,
+    norma(constituyentes, Goal, InitialH),
+    Start = [[0,InitialH], metro, constituyentes, 7],
+    a_star(Start,Goal,Path),
+    write(Path).
+    
+    /**
     getH([[3.3,7.93],metro,mixcoac,12], Ans),
     writeln(Ans),
-    Last = [[0.2,7.93],metro,mixcoac,7],
-    getChildNodes(Last, zocalo, C),
-    write("Cola de prioridades con pesos: "),
-    writeln(C).
-    /**
     %getChildNodes(metro,mixcoac,7, zapata, D),
     Queue = [],
     %writeln(Val),
