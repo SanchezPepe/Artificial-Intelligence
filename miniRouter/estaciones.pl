@@ -104,10 +104,10 @@ station(metro,ferreria,19.49039233,-99.173702,6,4).
 station(metro,norte_45,19.48823803,-99.16249037,6,5).
 station(metro,vallejo,19.49031142,-99.15479779,6,6).
 station(metro,instituto_del_petroleo,19.49054404,-99.14638638,6,7).
-station(metro,lindavista,19.4875806,-99.13434863,6,9).
-station(metro,deportivo_18_de_marzo,19.48358544,-99.12576556,6,10).
-station(metro,la_villa_basilica,19.4814715,-99.11815882,6,11).
-station(metro,martin_carrera,19.48231101,-99.10554171,6,12).
+station(metro,lindavista,19.4875806,-99.13434863,6,8).
+station(metro,deportivo_18_de_marzo,19.48358544,-99.12576556,6,9).
+station(metro,la_villa_basilica,19.4814715,-99.11815882,6,10).
+station(metro,martin_carrera,19.48231101,-99.10554171,6,11).
 %%_linea_7
 station(metro,el_rosario,19.5039547,-99.20029879,7,1).
 station(metro,aquiles_serdan,19.489367,-99.194511,7,2).
