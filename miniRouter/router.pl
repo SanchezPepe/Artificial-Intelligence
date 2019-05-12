@@ -176,8 +176,6 @@ test:-
     %Start = barranca_del_muerto,
     Start = polanco,
     Goal = universidad,
-    Line = 7,
-    Sys = metro,
     station(Sys, Start, _,_,Line,_),
     getPreviousFirst([Sys, Start, Line], Goal, First),
     a_star(First, [[0,0], Sys, Start, Line], Goal,Path),
