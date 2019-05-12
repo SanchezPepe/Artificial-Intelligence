@@ -347,12 +347,14 @@ listNotEmpty([_|_]):-
     input2: Estación destino
     output: Ruta
 */
-
 getRoute(Origen,Destino,Ruta):-
     compatibleCase(Origen,Destino,Case),
     (listNotEmpty(Case) ->
     adaptCase(Origen,Destino,Case,Ruta);
-    aStar(Origen,Destino,[Origen],Ruta),newCase(Ruta)). 
+    getPath(Origen,Destino,Ruta),newCase(Ruta)). 
 
-aStar(_,_,_,Ruta):-
-    Ruta = [esto,es,una,ruta,de,prueba].    
+getPath(Start, Goal, Path):-
+        station(Sys, Start,_,_,Line,_),
+        getPreviousFirst([Sys, Start, Line], Goal, First),
+        a_star(First, [[0,0], Sys, Start, Line], Goal,Path).
+    

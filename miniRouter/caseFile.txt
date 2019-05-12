@@ -1,1 +1,2 @@
 [sevilla,insurgentes,cuauhtemoc,balderas].
+[polanco,auditorio,constituyentes,tacubaya,san_pedro_de_los_pinos,san_antonio,mixcoac,insurgentes_sur,hospital_20_de_nov,zapata,coyoacan,viveros,miguel_angel_de_quevedo,copilco].
