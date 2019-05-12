@@ -47,6 +47,8 @@ getH(Node, Ans):-
 
 getName([_,_,Station, _], Name):-
     Name = Station.
+getName([_,Station, _], Name):-
+    Name = Station.
 
 % Añadir a cola de prioridades.
 addToPriorityQueue(Elem, _, [], First):-
@@ -69,7 +71,7 @@ popPriorityQueue([Queue|T], Rest, Elem):-
 numStations(System, Line, Count):-
     aggregate_all(count, station(System,_,_,_,Line,_), Count).
 
-adyacentStations(System, Station, Line, Stations):-
+adyacentStations([System, Station, Line], Stations):-
     station(System, Station, _, _, Line, Index),
     L is Index-1,
     R is Index+1,
@@ -77,38 +79,44 @@ adyacentStations(System, Station, Line, Stations):-
     (L > 0, R =< Count -> station(System,Left,_,_,Line, L), station(System,Right,_,_,Line, R), Stations = [Left, Right] 
     ; (L =:= 0 -> station(System,Right,_,_,Line, R), Stations = [Right] ; station(System,Left,_,_,Line, L), Stations = [Left])), !.
 
-% Regresa 1 si es a la derecha/abajo, -1 a la izq/arriba
-getDirection([H|[T]],_,Goal,_, Direction):-
-    norma(H,Goal, Left),
-    norma(T,Goal, Right),
-    (Left < Right -> Direction is -1 ; Direction is 1).
-getDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
-    station(_,Start,_,_,Line,StartOrder),    
-    station(_,H,_,_,Line,Order),
-    Dif is StartOrder-Order,
-    (Dif > 0 -> Dir is -1 ; Dir is 1).
-
 getSameStations(Station, Conections):-
     findall([System, Station, Line] ,station(System,Station,_,_,Line,_),Conections).
 
-getConnections(Sys, Node, Line, Connection):-
+getConnections([_, Sys, Node, Line], Connection):-
     getSameStations(Node, Con),
     delete(Con, [Sys,Node,Line], Connection).
 
+checkDirection([H|[T]],Start,Goal,Line, Direction):-
+    norma(H,Goal, Left),
+    norma(T,Goal, Right),
+    station(_, Start, _ ,_, Line, Index),
+    (Left < Right -> Direction is Index-1 ; Direction is Index+1).
+checkDirection([H|[]],Start, _,Line, Dir):- % Si es terminal o inicio de línea
+    station(_,Start,_,_,Line,StartOrder),    
+    station(_,H,_,_,Line,Order),
+    Dif is StartOrder-Order,
+    (Dif > 0 -> Dir is StartOrder-1 ; Dir is StartOrder+1).
+
+getDirection([Sys, Node, Line], Goal, New):-
+    adyacentStations([Sys, Node, Line], Stations),
+    checkDirection(Stations, Node, Goal, Line, Dir), 
+    station(Sys, Next, _ , _, Line, Dir),
+    New = [Sys, Next, Line], !.
+
 getAdyacentStationsCon([], _, Ans):-
     Ans = [].
-getAdyacentStationsCon(Conections, Goal, Ans):-
-    getHead(Conections, [Sys, Name, Line]),
-    adyacentStations(Sys, Name, Line, Ad),
-    getDirection(Ad, Name, Goal, Line, Direction),
-    station(Sys, Name, _, _, Line, Order),
-    Index is Order + Direction,
-    station(Sys, Next, _, _, Line, Index),
-    getTail(Conections, Rest),
+getAdyacentStationsCon(Connections, Goal, Ans):-
+    getHead(Connections, Head),
+    getDirection(Head, Goal, Next),
+    getTail(Connections, Rest),
     getAdyacentStationsCon(Rest, Goal, Con),
-    append([[Sys, Next, Line]], Con, Ans), !.
-    
+    append([Next], Con, Ans), !.
 
+nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
+    (norma(Node, Prev, G) -> SumG is G + PrevG ; SumG is PrevG),   % Peso del nodo previo al actual
+    norma(Node, Goal, H),   % Valor heurístico
+    List = [[SumG,H],Sys, Node, Line].
+    
 weightNodes([], _, _, _).
 weightNodes(Nodes, Goal, Prev, Weighted):-
     getTail(Nodes, Tail),
@@ -123,52 +131,63 @@ weightNodes(Nodes, Goal, Prev, Weighted):-
     F is G + H,
     addToPriorityQueue(NodeVal, F, W, Weighted), !.
 
-getChildNodes([W, Sys, Node, Line], Goal, WeightedChilds):-
-    station(Sys, Node, _,_,Line,Ind),
-    adyacentStations(Sys, Node, Line, Ad),
-    getDirection(Ad, Node, Goal, Line, Dir),
-    I is Ind + Dir,
-    station(Sys, Child, _,_,Line,I),  % Estación adyacente al nodo más cerana al Goal
-    getConnections(Sys, Node, Line, Connections), % Estaciones de transbordo
-    getAdyacentStationsCon(Conections, Goal, AdCon),
-    ChildInSameLine = [Sys, Child, Line],
-    append(AdCon, [ChildInSameLine], Childs), 
-    weightNodes(Childs, Goal, [W, Sys, Node, Line] , WeightedChilds), !.
+getNextStation([_,_, Prev, _], [_, Sys, Node, Line], Next):-
+    station(Sys,Node, _, _, Line, IndexNode),
+    station(Sys,Prev, _, _, Line, IndexPrev),
+    numStations(Sys, Line, Count),
+    (IndexNode =:= 1 -> Direction is 2 ; (IndexNode =:= Count -> Direction is Count-1 ; Direction is IndexNode + (IndexNode - IndexPrev))),
+    station(Sys,Name, _, _, Line, Direction),    
+    Next = [Sys, Name, Line], !.
+getNextStation([], _, Next):-
+    Next = [].
 
-nodeValue([Sys|[Node|[Line]]], Goal, Prev, PrevG, List):-
-    (norma(Node, Prev, G) -> SumG is G + PrevG ; SumG is PrevG),   % Peso del nodo previo al actual
-    norma(Node, Goal, H),   % Valor heurístico
-    List = [[SumG,H],Sys, Node, Line].
-
-% SuccessorCurrentCost = g(n) + dist(actual a sucesor)
-evaluateCurrentAndSuccessor(Current, Succesor, Ans):-
-    getG(Current, G),
-    getG(Succesor, W),
-    Ans = G + W.
+getChildNodes(Prev, Parent, Goal, WeightedChilds):-
+    getNextStation(Prev, Parent, Next), % Estación siguiente en la misma línea
+    getConnections(Parent, Conections),
+    getAdyacentStationsCon(Conections, Goal, AdCon), % Estaciones de transbordo
+    append(AdCon, [Next], Childs), 
+    (Prev \= [] -> getTail(Prev, PTail) ; PTail is " "),
+    delete(Childs, PTail, Cons),
+    weightNodes(Cons, Goal, Prev , WeightedChilds), !.
 
 /**
  * Inicia con la estación Start con el formato [[g(n)=0, h(n)], Sys, Station, Line].
  * **/
-a_star(Parent, Goal, Path):-
+a_star(Prev, Parent, Goal, Path):-
     getName(Parent, PName),
     PName \= Goal,
-    getChildNodes(Parent, Goal, Childs), % Obtiene los nodos hijos para la estación actual
+    getChildNodes(Prev, Parent, Goal, Childs), % Obtiene los nodos hijos para la estación actual
     getHead(Childs, Succesor), % Obtiene el primer hijo ordenado (f(n) más chico)
-    a_star(Succesor, Goal, Closed),
+    a_star(Parent, Succesor, Goal, Closed),
     append([PName], Closed, Path), !.
-a_star(_, Goal, Path):-
+a_star(_, _, Goal, Path):-
     Path = [Goal]. % Si se llegó al destino, Start = Goal
 
 test:-
-    Goal = el_caminero,
-    Start = olivo,
+    Start = barranca_del_muerto,
+    Goal = zapata,
+    Line = 7,
+    Sys = metro,
     station(Sys, Start, _,_,Line,_),
-    a_star([[0,0], Sys, Start, Line],Goal,Path),
-    write(Path).
+    a_star([[0,0], Sys, Start, Line], [[0,0], Sys, Start, Line], Goal,Path),
+    write(Path), !. 
+    %getAdyacentStationsCon([[metro, tacubaya, 7], [metro, tacubaya, 1], [metro, tacubaya, 9]], polanco, A),
+    %adyacentStations([metro, mixcoac, 7], A),
+    %getDirection([metro, el_rosario, 7], polanco, A),
+    
+    %getChildNodes([[0,0], metro, barranca_del_muerto, 7], [_, metro, barranca_del_muerto, 7], zapata, A),
+    %write(A).
+
     /**
     getConnections(metro, tacubaya, 9, Con),
     getAdyacentStationsCon(Con, mixcoac, C),
     write(C).
+
+    Start = el_rosario,
+    Goal = zapata,
+    station(Sys, Start, _,_,Line,_),
+    a_star([], [[0,0], Sys, Start, Line], Goal,Path),
+    write(Path), !.
 
     getH([[3.3,7.93],metro,mixcoac,12], Ans),
     writeln(Ans),
@@ -187,11 +206,4 @@ test:-
 
     nodeValue([metro,el_rosario, 7], pantitlan, mixcoac, List),
     writeln(List),
-
-    **/
-
-    /**
-     * 
-    nodeValue([metro, polanco, 7], mixcoac, nil, Node),
-    a_star(polanco, mixcoac, [Node], Path)
-    **/
+    */
