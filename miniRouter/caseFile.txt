@@ -1,2 +1,8 @@
 [sevilla,insurgentes,cuauhtemoc,balderas].
 [polanco,auditorio,constituyentes,tacubaya,san_pedro_de_los_pinos,san_antonio,mixcoac,insurgentes_sur,hospital_20_de_nov,zapata,coyoacan,viveros,miguel_angel_de_quevedo,copilco].
+[pantitlan,hangares,terminal_aerea,oceania,aragon,eduardo_molina,consulado,valle_gomez,misterios,la_raza,potrero].
+[xola,villa_de_cortes,nativitas,portales,ermita,general_anaya,tasquena,eugenia].
+[terminal_aerea,hangares,pantitlan,zaragoza,gomez_farias,blvd_puerto_aereo,balbuena,moctezuma,san_lazaro,candelaria,merced,pino_suarez,isabel_la_catolica,salto_del_agua,doctores].
+[ciudad_azteca,plaza_aragon,olimpica,tecnologico,muzquiz,rio_de_los_remedios,impulsora,nezahualcoyotl,villa_de_aragon,bosque_de_aragon,deportivo_oceania,romero_rubio,r_flores_magon,tepito,lagunilla,buenavista,tlahuac].
+[universidad,copilco,miguel_angel_de_quevedo,viveros,coyoacan,zapata,hospital_20_de_nov,insurgentes_sur,mixcoac,barranca_del_muerto].
+[insurgentes,cuauhtemoc].

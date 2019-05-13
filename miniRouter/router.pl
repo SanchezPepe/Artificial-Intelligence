@@ -350,7 +350,7 @@ listNotEmpty([_|_]):-
 getRoute(Origen,Destino,Ruta):-
     compatibleCase(Origen,Destino,Case),
     (listNotEmpty(Case) ->
-    adaptCase(Origen,Destino,Case,Ruta);
+    adaptCase(Origen,Destino,Case,Ruta),newCase(Ruta);
     getPath(Origen,Destino,Ruta),newCase(Ruta)). 
 
 getPath(Start, Goal, Path):-
