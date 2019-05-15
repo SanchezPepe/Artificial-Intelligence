@@ -6,3 +6,11 @@
 [ciudad_azteca,plaza_aragon,olimpica,tecnologico,muzquiz,rio_de_los_remedios,impulsora,nezahualcoyotl,villa_de_aragon,bosque_de_aragon,deportivo_oceania,romero_rubio,r_flores_magon,tepito,lagunilla,buenavista,tlahuac].
 [universidad,copilco,miguel_angel_de_quevedo,viveros,coyoacan,zapata,hospital_20_de_nov,insurgentes_sur,mixcoac,barranca_del_muerto].
 [insurgentes,cuauhtemoc].
+[ciudad_azteca,plaza_aragon,olimpica,tecnologico,muzquiz,rio_de_los_remedios,impulsora,nezahualcoyotl,villa_de_aragon,bosque_de_aragon,deportivo_oceania,romero_rubio,r_flores_magon,tepito,lagunilla,buenavista,mixcoac].
+[universidad,copilco,miguel_angel_de_quevedo,viveros,coyoacan,zapata,hospital_20_de_nov,insurgentes_sur,mixcoac,barranca_del_muerto].
+[tlahuac,tlaltenco,zapotitlan,nopalera,olivos,tezonco,periferico_ote,calle_11,lomas_estrella,san_andres_tomatlan,culhuacan,atlalilco,mexicaltzingo,eje_central,parque_de_los_venados,zapata,division_del_norte,eugenia,etiopia_plaza_de_la_transparencia,centro_medico,chilpancingo,patriotismo,tacubaya,juanacatlan,chapultepec,sevilla,insurgentes,cuauhtemoc,balderas,juarez,hidalgo,revolucion,san_cosme,normal,colegio_militar,popotla,cuitlahuac,tacuba,refineria,camarones,aquiles_serdan,el_rosario].
+[jamaica,mixhuca,velodromo,ciudad_deportiva,puebla].
+[mixhuca,velodromo].
+[hidalgo,revolucion,san_cosme,normal,colegio_militar,popotla,cuitlahuac,tacuba].
+[hidalgo,revolucion,san_cosme,normal,colegio_militar,popotla,cuitlahuac,tacuba].
+[tasquena,general_anaya,ermita,portales,nativitas,villa_de_cortes,xola,viaducto,chabacano,lazaro_cardenas,centro_medico,hospital_general].

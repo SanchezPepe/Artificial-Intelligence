@@ -291,19 +291,21 @@ findCase(Station1,Station2,[_|Tail],Res):-
     Pregunta si el usuario desea obtener otra ruta.
 */
 main:-
-    write("Bienvenido a Weis, el mejor sistema inteligente de navegación en la CDMX."),nl,main2.
+    write("Bienvenido a Weis, el mejor sistema inteligente de navegación en la CDMX."),nl,nl,main2.
 main2:-
+    write("------------------------------------------------------------------------------------"),nl,nl,
     write("Por favor ingrese el origen de su viaje."),nl,
     read(Origen),
-    write("Ahora, escriba el destino de su viaje."),nl,
+    write("Ahora, escriba el destino de su viaje."),nl,nl,
     read(Destino),
     (station(_,Origen,_,_,_,_),station(_,Destino,_,_,_,_) -> 
     getRoute(Origen,Destino,Ruta);
     write("Ha habido un error ingresando el origen o el destino."),nl,main2),
     write("La ruta a seguir es: "),nl,
     imprime(Ruta,Origen),
+    write("------------------------------------------------------------------------------------"),nl,nl,
     write("¿Desea hacer otro viaje?"),nl,read(Respuesta),
-    (Respuesta == si -> main2;
+    (Respuesta == si -> nl,nl,nl,main2;
     write("Gracias por usar Weis.")),!.
     
 /**
@@ -350,8 +352,8 @@ listNotEmpty([_|_]):-
 getRoute(Origen,Destino,Ruta):-
     compatibleCase(Origen,Destino,Case),
     (listNotEmpty(Case) ->
-    adaptCase(Origen,Destino,Case,Ruta),newCase(Ruta);
-    getPath(Origen,Destino,Ruta),newCase(Ruta)). 
+    adaptCase(Origen,Destino,Case,Ruta),newCase(Ruta),write("Se usó RBC para regresar esta ruta. "),nl;
+    getPath(Origen,Destino,Ruta),newCase(Ruta),write("Se usó el algoritmo A* para regresar esta ruta. "),nl). 
 
 getPath(Start, Goal, Path):-
         station(Sys, Start,_,_,Line,_),
